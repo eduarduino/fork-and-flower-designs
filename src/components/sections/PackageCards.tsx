@@ -140,15 +140,17 @@ function PackageCard({
   onViewDetails?: (pkg: Package) => void;
 }) {
   const isSignature = pkg.name.toLowerCase().includes("signature");
-  const isHighlighted = pkg.highlighted && !isSignature;
+  const isFullHome = pkg.name.toLowerCase().includes("full home");
 
   // Tier 1: Clean, minimal border
-  // Tier 2 (highlighted): Same border, no special treatment
-  // Tier 3 (signature): Gold left accent bar + soft resting shadow
+  // Tier 2 (signature): Gold left accent bar + soft resting shadow
+  // Premium (full home): Full gold border all around + shadow
 
-  const cardClasses = isSignature
-    ? "border-cream-dark border-l-[3px] border-l-gold shadow-md bg-cream-dark"
-    : "border-cream-dark bg-cream-dark";
+  const cardClasses = isFullHome
+    ? "border-gold shadow-md bg-cream-dark"
+    : isSignature
+      ? "border-cream-dark border-l-[3px] border-l-gold shadow-md bg-cream-dark"
+      : "border-cream-dark bg-cream-dark";
 
   return (
     <div
