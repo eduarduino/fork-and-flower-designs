@@ -297,7 +297,7 @@ export function InquiryForm() {
     "font-serif text-lg md:text-xl text-charcoal tracking-wide mb-6 pb-2 border-b border-cream-dark";
 
   const textAreaStyles =
-    `${inputStyles} resize-none overflow-hidden tracking-normal leading-relaxed`;
+    "w-full bg-transparent border-b border-cream-dark focus:border-gold outline-none py-2.5 font-sans text-sm md:text-sm tracking-normal leading-6 text-charcoal placeholder:text-charcoal-light/60 transition-colors duration-300 resize-none overflow-hidden";
 
   return (
     <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-12">
@@ -627,7 +627,7 @@ export function InquiryForm() {
             <textarea
               {...register("colorPalette")}
               className={textAreaStyles}
-              rows={1}
+              rows={2}
               onInput={(e) => {
                 e.currentTarget.style.height = "auto";
                 e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
@@ -640,7 +640,7 @@ export function InquiryForm() {
             <textarea
               {...register("themeOrVibe")}
               className={textAreaStyles}
-              rows={1}
+              rows={2}
               onInput={(e) => {
                 e.currentTarget.style.height = "auto";
                 e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
@@ -653,7 +653,7 @@ export function InquiryForm() {
             <textarea
               {...register("mustHaveElements")}
               className={textAreaStyles}
-              rows={1}
+              rows={2}
               onInput={(e) => {
                 e.currentTarget.style.height = "auto";
                 e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
@@ -762,7 +762,7 @@ export function InquiryForm() {
             </span>
             <span className="font-sans text-xs leading-relaxed tracking-wider text-charcoal-light group-hover:text-charcoal transition-colors">
               I understand a non-refundable booking fee is required to secure my
-              date. *
+              date.{"\u00A0*"}
             </span>
           </label>
           {errors.acknowledgeBookingFee && (
@@ -794,7 +794,7 @@ export function InquiryForm() {
               </svg>
             </span>
             <span className="font-sans text-xs leading-relaxed tracking-wider text-charcoal-light group-hover:text-charcoal transition-colors">
-              I understand this form does not guarantee availability. *
+              I understand this form does not guarantee availability.{"\u00A0*"}
             </span>
           </label>
           {errors.acknowledgeAvailability && (
