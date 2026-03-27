@@ -4,12 +4,18 @@ import { Button } from "@/components/ui/Button";
 import { services } from "@/data/services";
 import { HeroSection } from "@/components/sections/Hero";
 import { ServicePreviewCard } from "@/components/sections/ServiceCard";
-import { GalleryTeaser } from "@/components/sections/GalleryTeaser";
 
 export default function Home() {
   return (
     <>
       <HeroSection />
+
+      {/* Decorative Script */}
+      <div className="py-8 text-center bg-white">
+        <p className="font-serif italic text-xl md:text-2xl text-gold-dark tracking-wide">
+          Where flowers meet the table
+        </p>
+      </div>
 
       {/* Services Preview */}
       <Section background="white">
@@ -29,19 +35,12 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* Gallery Teaser */}
-      <Section background="cream">
-        <SectionHeading
-          title="A Glimpse of Our Work"
-          subtitle="Curated moments, beautifully styled"
-        />
-        <GalleryTeaser />
-        <div className="mt-14 text-center">
-          <Button href="/gallery" variant="outline">
-            View Full Gallery
-          </Button>
-        </div>
-      </Section>
+      {/* Decorative Script */}
+      <div className="py-8 text-center bg-cream">
+        <p className="font-serif italic text-xl md:text-2xl text-gold-dark tracking-wide">
+          Where décor comes to life
+        </p>
+      </div>
 
       {/* CTA Section */}
       <Section background="charcoal">
@@ -52,7 +51,10 @@ export default function Home() {
             You&apos;ll Remember
           </h2>
           <div className="mx-auto mt-5 h-px w-16 bg-gold" />
-          <p className="mx-auto mt-8 max-w-lg font-sans text-sm leading-relaxed text-cream/60 tracking-wider">
+          <p className="mx-auto mt-6 font-serif italic text-lg text-gold-light tracking-wide">
+            Petals, plates, &amp; people
+          </p>
+          <p className="mx-auto mt-4 max-w-lg font-sans text-sm leading-relaxed text-cream/60 tracking-wider">
             Ready to transform your next gathering into an unforgettable
             experience? We&apos;d love to hear about your vision.
           </p>
