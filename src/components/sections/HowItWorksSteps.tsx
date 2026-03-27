@@ -8,33 +8,33 @@ import {
 const steps = [
   {
     number: "01",
-    title: "Reach Out",
+    title: "Submit Your Event Form",
     description:
-      "Fill out our inquiry form to share your vision, event date, and what you're looking for. We'll get back to you within 48 hours.",
+      "Fill out our event inquiry form with your details — date, event type, guest count, and your styling vision. We'll review and get back to you within 48 hours.",
   },
   {
     number: "02",
-    title: "Consultation",
+    title: "Design & Planning",
     description:
-      "We'll schedule a call or meet to discuss your style, event details, and how we can bring your vision to life.",
+      "We'll connect to discuss your event in detail — colors, theme, must-have elements, and package selection. From there, we create a custom design plan tailored to your gathering.",
   },
   {
     number: "03",
-    title: "Design & Curation",
+    title: "Day-of Setup",
     description:
-      "We'll curate a custom design plan — selecting florals, linens, decor, and styling elements tailored to your event.",
+      "On the day of your event, we arrive early to transform your space. Every detail is styled and placed with care so everything is picture-perfect before your guests arrive.",
   },
   {
     number: "04",
-    title: "Setup & Styling",
+    title: "Enjoy Your Gathering",
     description:
-      "On the day, our team arrives to transform your space. Relax and enjoy while we handle every detail.",
+      "Relax, host, and soak in the moment. Your table is set, your island is styled, and all you need to do is enjoy the people around you.",
   },
   {
     number: "05",
-    title: "Celebrate",
+    title: "Breakdown",
     description:
-      "Gather around a beautifully styled table and create moments worth remembering. We handle breakdown too.",
+      "After your event, we return to break down and collect all styling elements. You don't have to worry about a thing.",
   },
 ];
 
