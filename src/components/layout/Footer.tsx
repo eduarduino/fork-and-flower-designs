@@ -55,9 +55,14 @@ export function Footer() {
             href={socialLinks.instagram}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-sans text-[10px] tracking-[0.2em] uppercase text-cream/40 hover:text-gold transition-colors duration-300"
+            className="text-cream/40 hover:text-gold transition-colors duration-300"
+            aria-label="Follow us on Instagram"
           >
-            Instagram
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" />
+              <circle cx="12" cy="12" r="5" />
+              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+            </svg>
           </a>
         </div>
       </div>
