@@ -10,12 +10,12 @@ const config: Config = {
     extend: {
       colors: {
         cream: {
-          DEFAULT: "#FAF7F2",
-          dark: "#F0EBE3",
+          DEFAULT: "#FFFFFF",
+          dark: "#EBDED4",
         },
         charcoal: {
-          DEFAULT: "#2C2C2C",
-          light: "#4A4A4A",
+          DEFAULT: "#3A320C",
+          light: "#5C5230",
         },
         gold: {
           DEFAULT: "#C9A96E",
@@ -23,8 +23,8 @@ const config: Config = {
           dark: "#B08D4F",
         },
         blush: {
-          DEFAULT: "#E8D5C4",
-          light: "#F2E6DA",
+          DEFAULT: "#EBDED4",
+          light: "#F3EBE4",
         },
         sage: "#A8B5A0",
       },
