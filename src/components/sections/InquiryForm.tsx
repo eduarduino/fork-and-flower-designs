@@ -669,7 +669,7 @@ export function InquiryForm() {
         <legend className={sectionTitleStyles}>
           Arrangements &amp; Add-Ons
         </legend>
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div className="grid gap-3 sm:grid-cols-2">
             {addOnOptions.map((option) => (
               <label
@@ -703,14 +703,14 @@ export function InquiryForm() {
           </div>
 
           <div id="field-foodOnIsland">
-            <label className={`${labelStyles} block mb-3`}>
+            <label className="block mb-4 font-sans text-[10px] tracking-[0.14em] sm:tracking-[0.2em] uppercase leading-relaxed text-charcoal-light">
               Will food be displayed on the island? *
             </label>
-            <div className="flex gap-6">
+            <div className="grid max-w-[220px] grid-cols-2 gap-4">
               {(["yes", "no"] as const).map((val) => (
                 <label
                   key={val}
-                  className="relative flex items-center gap-2 cursor-pointer group"
+                  className="relative inline-flex items-center gap-2.5 cursor-pointer group"
                 >
                   <input
                     type="radio"
@@ -718,7 +718,7 @@ export function InquiryForm() {
                     {...register("foodOnIsland")}
                     className="peer sr-only"
                   />
-                  <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-cream-dark peer-checked:border-gold peer-checked:bg-gold/20 transition-all duration-200 after:content-[''] after:h-2 after:w-2 after:rounded-full after:bg-gold after:scale-0 peer-checked:after:scale-100 after:transition-transform after:duration-200" />
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-cream-dark peer-checked:border-gold peer-checked:bg-gold/20 transition-all duration-200 after:content-[''] after:h-2.5 after:w-2.5 after:rounded-full after:bg-gold after:scale-0 peer-checked:after:scale-100 after:transition-transform after:duration-200" />
                   <span className="font-sans text-xs tracking-wider text-charcoal-light group-hover:text-charcoal transition-colors capitalize">
                     {val}
                   </span>
