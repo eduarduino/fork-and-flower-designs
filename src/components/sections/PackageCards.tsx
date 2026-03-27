@@ -215,29 +215,24 @@ export function PackageCards() {
           <h3 className="font-serif text-2xl md:text-3xl text-charcoal tracking-wide text-center mb-10">
             Premium Add-Ons
           </h3>
-          <div className="mx-auto max-w-lg">
-            <div className="p-8 md:p-10 border border-gold bg-cream-dark">
-              <p className="font-sans text-xs tracking-wider text-charcoal-light mb-6">
-                Elevate your event with curated services available alongside any package.
-              </p>
-              <div className="h-px bg-cream-dark my-6" />
-              <ul className="space-y-4">
-                {premiumAddOns.map((addon) => (
-                  <li key={addon.name} className="flex items-start gap-3">
-                    <span className="mt-0.5 text-gold text-sm">✦</span>
-                    <div>
-                      <span className="font-serif text-base tracking-wide text-charcoal">
-                        {addon.name}
-                      </span>
-                      <p className="mt-1 font-sans text-xs tracking-wider text-charcoal-light leading-relaxed">
-                        {addon.description}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+          <StaggerChildren
+            className="grid gap-8 md:grid-cols-2"
+            staggerDelay={0.1}
+          >
+            {premiumAddOns.map((addon) => (
+              <StaggerItem key={addon.name}>
+                <div className="flex flex-col h-full p-8 md:p-10 border border-cream-dark bg-white hover:border-gold/50 transition-all duration-300 hover:shadow-lg">
+                  <h4 className="font-serif text-2xl tracking-wide text-charcoal">
+                    {addon.name}
+                  </h4>
+                  <div className="h-px bg-cream-dark my-6" />
+                  <p className="font-sans text-xs tracking-wider text-charcoal-light leading-relaxed">
+                    {addon.description}
+                  </p>
+                </div>
+              </StaggerItem>
+            ))}
+          </StaggerChildren>
         </div>
       </div>
 
