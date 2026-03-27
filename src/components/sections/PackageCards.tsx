@@ -135,21 +135,15 @@ function GoldDivider() {
 function PackageCard({
   pkg,
   onViewDetails,
-  tier,
 }: {
   pkg: Package;
   onViewDetails?: (pkg: Package) => void;
-  tier?: number;
 }) {
   const isSignature = pkg.name.toLowerCase().includes("signature");
 
   return (
     <div
-      className={`relative flex flex-col h-full border transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
-        isSignature || pkg.highlighted
-          ? "border-cream-dark bg-cream-dark"
-          : "border-cream-dark bg-white hover:border-gold/50"
-      }`}
+      className="relative flex flex-col h-full border border-cream-dark bg-cream-dark transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
     >
       {/* Top accent line for signature + highlighted cards */}
       {(isSignature || pkg.highlighted) && (
@@ -157,13 +151,6 @@ function PackageCard({
       )}
 
       <div className="flex flex-col h-full p-8 md:p-10">
-        {/* Tier number */}
-        {tier !== undefined && (
-          <p className="font-serif text-5xl text-charcoal/[0.06] leading-none mb-2">
-            {String(tier).padStart(2, "0")}
-          </p>
-        )}
-
         {isSignature && (
           <p className="font-sans text-[10px] tracking-[0.2em] uppercase text-gold mb-3">
             Signature Experience
@@ -231,9 +218,9 @@ export function PackageCards() {
               className="grid gap-8 md:grid-cols-3"
               staggerDelay={0.15}
             >
-              {category.packages.map((pkg, idx) => (
+              {category.packages.map((pkg) => (
                 <StaggerItem key={pkg.name}>
-                  <PackageCard pkg={pkg} onViewDetails={setSelectedPkg} tier={idx + 1} />
+                  <PackageCard pkg={pkg} onViewDetails={setSelectedPkg} />
                 </StaggerItem>
               ))}
             </StaggerChildren>
