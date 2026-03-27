@@ -13,7 +13,7 @@ interface InquiryData {
   startTime: string;
   eventType: string;
   guestCount: string;
-  serviceType: "tablescape" | "island-buffet" | "both";
+  services: string[];
   packages: string[];
   colorPalette?: string;
   themeOrVibe?: string;
@@ -26,19 +26,21 @@ interface InquiryData {
   signature: string;
 }
 
-const serviceTypeLabels: Record<string, string> = {
+const serviceLabels: Record<string, string> = {
   tablescape: "Tablescape Styling",
   "island-buffet": "Island / Buffet Styling",
-  both: "Both",
 };
 
 export async function sendOwnerNotification(data: InquiryData) {
   const resend = getResendClient();
   const fullName = `${data.firstName} ${data.lastName}`;
   const packageList = data.packages.join(", ");
+  const serviceList = data.services.map(s => serviceLabels[s] || s).join(", ");
   const addOnList = data.addOns?.length ? data.addOns.join(", ") : "None";
 
-  await resend.emails.send({
+  console.log("Sending owner notification to:", process.env.BUSINESS_EMAIL);
+  console.log("From:", process.env.FROM_EMAIL);
+  const ownerResult = await resend.emails.send({
     from: process.env.FROM_EMAIL || "Fork & Flower <noreply@forkandflower.com>",
     to: process.env.BUSINESS_EMAIL || "",
     subject: `New Event Inquiry from ${fullName}`,
@@ -65,7 +67,7 @@ export async function sendOwnerNotification(data: InquiryData) {
 
         <h3 style="color: #C9A96E; margin-top: 24px;">Services &amp; Packages</h3>
         <table style="width: 100%; border-collapse: collapse;">
-          <tr><td style="padding: 6px 0; font-weight: bold; width: 160px;">Service Type:</td><td>${serviceTypeLabels[data.serviceType]}</td></tr>
+          <tr><td style="padding: 6px 0; font-weight: bold; width: 160px;">Services:</td><td>${serviceList}</td></tr>
           <tr><td style="padding: 6px 0; font-weight: bold;">Packages:</td><td>${packageList}</td></tr>
         </table>
 
@@ -87,18 +89,23 @@ export async function sendOwnerNotification(data: InquiryData) {
         <h3 style="color: #C9A96E; margin-top: 24px;">Signature</h3>
         <table style="width: 100%; border-collapse: collapse;">
           <tr><td style="padding: 6px 0; font-weight: bold; width: 160px;">Printed Name:</td><td>${data.printName}</td></tr>
-          <tr><td style="padding: 6px 0; font-weight: bold;">Signature:</td><td style="font-style: italic;">${data.signature}</td></tr>
+          <tr>
+            <td style="padding: 6px 0; font-weight: bold;">Signature:</td>
+            <td>${data.signature.startsWith("data:image") ? `<img src="${data.signature}" alt="Signature" style="max-width: 300px; height: auto;" />` : `<span style="font-style: italic;">${data.signature}</span>`}</td>
+          </tr>
         </table>
       </div>
     `,
   });
+  console.log("Owner notification result:", JSON.stringify(ownerResult));
 }
 
 export async function sendClientConfirmation(data: InquiryData) {
   const resend = getResendClient();
   const fullName = `${data.firstName} ${data.lastName}`;
 
-  await resend.emails.send({
+  console.log("Sending client confirmation to:", data.email);
+  const clientResult = await resend.emails.send({
     from: process.env.FROM_EMAIL || "Fork & Flower <noreply@forkandflower.com>",
     to: data.email,
     subject: "Thank you for your inquiry — Fork & Flower Designs",
@@ -129,4 +136,5 @@ export async function sendClientConfirmation(data: InquiryData) {
       </div>
     `,
   });
+  console.log("Client confirmation result:", JSON.stringify(clientResult));
 }

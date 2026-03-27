@@ -48,11 +48,18 @@ export async function POST(request: Request) {
     const data = result.data;
 
     // Send emails (only if API key is configured)
-    if (process.env.RESEND_API_KEY) {
-      await Promise.all([
-        sendOwnerNotification(data),
-        sendClientConfirmation(data),
-      ]);
+    const apiKey = process.env.RESEND_API_KEY;
+    console.log("RESEND_API_KEY present:", !!apiKey, "length:", apiKey?.length);
+    if (apiKey) {
+      try {
+        await Promise.all([
+          sendOwnerNotification(data),
+          sendClientConfirmation(data),
+        ]);
+        console.log("Emails sent successfully");
+      } catch (emailError) {
+        console.error("Email sending failed:", emailError);
+      }
     } else {
       console.log("RESEND_API_KEY not configured. Inquiry data:", data);
     }

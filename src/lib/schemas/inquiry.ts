@@ -30,7 +30,7 @@ export const inquirySchema = z.object({
       today.setHours(0, 0, 0, 0);
       return selected >= today;
     }, "Event date must be today or in the future"),
-  startTime: z.string().min(1, "Please enter a start time"),
+  startTime: z.string().min(1, "Please select a start time"),
   eventType: z.string().min(1, "Please select an event type"),
   guestCount: z
     .string()
@@ -42,9 +42,7 @@ export const inquirySchema = z.object({
     }, "Guest count must be between 1 and 500"),
 
   // Services
-  serviceType: z.enum(["tablescape", "island-buffet", "both"], {
-    required_error: "Please select a service type",
-  }),
+  services: z.array(z.string()).min(1, "Please select at least one service"),
 
   // Package Selection
   packages: z.array(z.string()).min(1, "Please select at least one package"),
@@ -57,7 +55,8 @@ export const inquirySchema = z.object({
   // Arrangements & Add-ons
   addOns: z.array(z.string()).optional(),
   foodOnIsland: z.enum(["yes", "no"], {
-    required_error: "Please select an option",
+    required_error: "Please select yes or no",
+    invalid_type_error: "Please select yes or no",
   }),
 
   // Required Acknowledgements
@@ -78,9 +77,7 @@ export const inquirySchema = z.object({
     .regex(nameRegex, "Name can only contain letters, hyphens, and apostrophes"),
   signature: z
     .string()
-    .min(2, "Please provide your signature")
-    .max(100, "Signature is too long")
-    .regex(nameRegex, "Signature can only contain letters, hyphens, and apostrophes"),
+    .min(1, "Please provide your signature"),
 });
 
 export type InquiryFormData = z.infer<typeof inquirySchema>;
@@ -95,10 +92,9 @@ export const eventTypes = [
   "Other",
 ] as const;
 
-export const serviceTypes = [
+export const serviceOptions = [
   { value: "tablescape", label: "Tablescape Styling" },
   { value: "island-buffet", label: "Island / Buffet Styling" },
-  { value: "both", label: "Both" },
 ] as const;
 
 export const packageOptions = [
@@ -108,6 +104,7 @@ export const packageOptions = [
   { value: "simple-spread", label: "The Simple Spread" },
   { value: "styled-spread", label: "The Styled Spread" },
   { value: "signature-spread", label: "The Signature Spread" },
+  { value: "full-home-experience", label: "The Full Home Experience" },
 ] as const;
 
 export const addOnOptions = [

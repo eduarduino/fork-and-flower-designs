@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
@@ -8,11 +8,174 @@ import {
   inquirySchema,
   type InquiryFormData,
   eventTypes,
-  serviceTypes,
+  serviceOptions,
   packageOptions,
   addOnOptions,
 } from "@/lib/schemas/inquiry";
 import { Button } from "@/components/ui/Button";
+
+/* ── Time slot options (30-min increments) ── */
+const timeSlots: string[] = [];
+for (let h = 8; h <= 23; h++) {
+  for (const m of [0, 30]) {
+    if (h === 23 && m === 30) break;
+    const hour12 = h > 12 ? h - 12 : h === 0 ? 12 : h;
+    const period = h >= 12 ? "PM" : "AM";
+    const min = m === 0 ? "00" : "30";
+    timeSlots.push(`${hour12}:${min} ${period}`);
+  }
+}
+
+/* ── Phone auto-format helper ── */
+function formatPhone(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 10);
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+}
+
+/* ── Date helpers ── */
+const months = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+] as const;
+
+function getDaysInMonth(month: number, year: number): number {
+  if (!month || !year) return 31;
+  return new Date(year, month, 0).getDate();
+}
+
+function getYearOptions(): number[] {
+  const current = new Date().getFullYear();
+  const years: number[] = [];
+  for (let y = current; y <= current + 3; y++) years.push(y);
+  return years;
+}
+
+/* ── Signature Pad ── */
+function SignaturePad({
+  onChange,
+  error,
+}: {
+  onChange: (dataUrl: string) => void;
+  error?: string;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isDrawing = useRef(false);
+  const [hasSignature, setHasSignature] = useState(false);
+
+  const getPos = (
+    e: React.MouseEvent | React.TouchEvent,
+    canvas: HTMLCanvasElement
+  ) => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    if ("touches" in e) {
+      return {
+        x: (e.touches[0].clientX - rect.left) * scaleX,
+        y: (e.touches[0].clientY - rect.top) * scaleY,
+      };
+    }
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
+    };
+  };
+
+  const startDraw = (e: React.MouseEvent | React.TouchEvent) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    isDrawing.current = true;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const pos = getPos(e, canvas);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+  };
+
+  const draw = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isDrawing.current) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const pos = getPos(e, canvas);
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "#3A320C";
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+  };
+
+  const endDraw = () => {
+    if (!isDrawing.current) return;
+    isDrawing.current = false;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    setHasSignature(true);
+    onChange(canvas.toDataURL("image/png"));
+  };
+
+  const clearCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setHasSignature(false);
+    onChange("");
+  }, [onChange]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const handler = (e: TouchEvent) => {
+      if (isDrawing.current) e.preventDefault();
+    };
+    canvas.addEventListener("touchmove", handler, { passive: false });
+    return () => canvas.removeEventListener("touchmove", handler);
+  }, []);
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <span className="font-sans text-[10px] tracking-[0.2em] uppercase text-charcoal-light">
+          Signature *
+        </span>
+        {hasSignature && (
+          <button
+            type="button"
+            onClick={clearCanvas}
+            className="font-sans text-[10px] tracking-wider text-charcoal-light/60 hover:text-gold transition-colors"
+          >
+            Clear
+          </button>
+        )}
+      </div>
+      <canvas
+        ref={canvasRef}
+        width={600}
+        height={160}
+        className={`w-full h-32 border rounded cursor-crosshair bg-white/50 ${
+          error ? "border-red-400" : "border-cream-dark"
+        }`}
+        onMouseDown={startDraw}
+        onMouseMove={draw}
+        onMouseUp={endDraw}
+        onMouseLeave={endDraw}
+        onTouchStart={startDraw}
+        onTouchMove={draw}
+        onTouchEnd={endDraw}
+      />
+      <p className="mt-1 font-sans text-[10px] tracking-wider text-charcoal-light/50">
+        Draw your signature above using your mouse or finger
+      </p>
+      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+    </div>
+  );
+}
 
 export function InquiryForm() {
   const [submitStatus, setSubmitStatus] = useState<
@@ -22,16 +185,39 @@ export function InquiryForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
+    setValue,
+    watch,
     reset,
   } = useForm<InquiryFormData>({
     resolver: zodResolver(inquirySchema),
-    mode: "onTouched",
+    mode: "onChange",
     defaultValues: {
       packages: [],
       addOns: [],
+      services: [],
+      phone: "",
+      signature: "",
     },
   });
+
+  const phoneValue = watch("phone");
+
+  // Date dropdowns state
+  const [dateMonth, setDateMonth] = useState("");
+  const [dateDay, setDateDay] = useState("");
+  const [dateYear, setDateYear] = useState("");
+  const daysInMonth = getDaysInMonth(parseInt(dateMonth), parseInt(dateYear));
+
+  const syncDate = (m: string, d: string, y: string) => {
+    if (m && d && y) {
+      const mm = m.padStart(2, "0");
+      const dd = d.padStart(2, "0");
+      setValue("eventDate", `${y}-${mm}-${dd}`, { shouldValidate: true });
+    } else {
+      setValue("eventDate", "", { shouldValidate: false });
+    }
+  };
 
   const onSubmit = async (data: InquiryFormData) => {
     setSubmitStatus("loading");
@@ -122,10 +308,19 @@ export function InquiryForm() {
             <div>
               <label className={labelStyles}>Phone # *</label>
               <input
-                {...register("phone")}
                 type="tel"
+                inputMode="numeric"
                 className={inputStyles}
                 placeholder="(555) 123-4567"
+                value={phoneValue}
+                onChange={(e) => {
+                  const formatted = formatPhone(e.target.value);
+                  setValue("phone", formatted, { shouldValidate: true });
+                }}
+                onBlur={() => {
+                  // trigger validation on blur
+                  setValue("phone", phoneValue, { shouldValidate: true, shouldTouch: true });
+                }}
               />
               {errors.phone && (
                 <p className="mt-1 text-xs text-red-500">
@@ -158,11 +353,48 @@ export function InquiryForm() {
           <div className="grid gap-8 md:grid-cols-2">
             <div>
               <label className={labelStyles}>Event Date *</label>
-              <input
-                {...register("eventDate")}
-                type="date"
-                className={inputStyles}
-              />
+              <input type="hidden" {...register("eventDate")} />
+              <div className="grid grid-cols-3 gap-3">
+                <select
+                  className={`${inputStyles} cursor-pointer`}
+                  value={dateMonth}
+                  onChange={(e) => {
+                    setDateMonth(e.target.value);
+                    syncDate(e.target.value, dateDay, dateYear);
+                  }}
+                >
+                  <option value="" disabled>Month</option>
+                  {months.map((name, i) => (
+                    <option key={name} value={String(i + 1)}>{name}</option>
+                  ))}
+                </select>
+                <select
+                  className={`${inputStyles} cursor-pointer`}
+                  value={dateDay}
+                  onChange={(e) => {
+                    setDateDay(e.target.value);
+                    syncDate(dateMonth, e.target.value, dateYear);
+                  }}
+                >
+                  <option value="" disabled>Day</option>
+                  {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => (
+                    <option key={d} value={String(d)}>{d}</option>
+                  ))}
+                </select>
+                <select
+                  className={`${inputStyles} cursor-pointer`}
+                  value={dateYear}
+                  onChange={(e) => {
+                    setDateYear(e.target.value);
+                    syncDate(dateMonth, dateDay, e.target.value);
+                  }}
+                >
+                  <option value="" disabled>Year</option>
+                  {getYearOptions().map((y) => (
+                    <option key={y} value={String(y)}>{y}</option>
+                  ))}
+                </select>
+              </div>
               {errors.eventDate && (
                 <p className="mt-1 text-xs text-red-500">
                   {errors.eventDate.message}
@@ -171,11 +403,20 @@ export function InquiryForm() {
             </div>
             <div>
               <label className={labelStyles}>Start Time *</label>
-              <input
+              <select
                 {...register("startTime")}
-                type="time"
-                className={inputStyles}
-              />
+                className={`${inputStyles} cursor-pointer`}
+                defaultValue=""
+              >
+                <option value="" disabled>
+                  Select a time
+                </option>
+                {timeSlots.map((slot) => (
+                  <option key={slot} value={slot}>
+                    {slot}
+                  </option>
+                ))}
+              </select>
               {errors.startTime && (
                 <p className="mt-1 text-xs text-red-500">
                   {errors.startTime.message}
@@ -227,21 +468,34 @@ export function InquiryForm() {
 
       {/* ── Services ── */}
       <fieldset>
-        <legend className={sectionTitleStyles}>Services</legend>
-        <div className="space-y-3">
-          {serviceTypes.map((option) => (
+        <legend className={sectionTitleStyles}>What services are you interested in?</legend>
+        <p className="font-sans text-xs tracking-wider text-charcoal-light/70 -mt-4 mb-5">
+          Select all that apply.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {serviceOptions.map((option) => (
             <label
               key={option.value}
               className="flex items-center gap-3 cursor-pointer group"
             >
               <input
-                type="radio"
+                type="checkbox"
                 value={option.value}
-                {...register("serviceType")}
+                {...register("services")}
                 className="peer sr-only"
               />
-              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-cream-dark peer-checked:border-gold transition-all duration-200">
-                <span className="h-2 w-2 rounded-full bg-gold opacity-0 peer-checked:opacity-100 transition-opacity" />
+              <span className="flex h-4 w-4 shrink-0 items-center justify-center border border-cream-dark peer-checked:border-gold peer-checked:bg-gold transition-all duration-200">
+                <svg
+                  className="h-2.5 w-2.5 text-white opacity-0 peer-checked:opacity-100"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                >
+                  <path
+                    d="M2 6l3 3 5-5"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                </svg>
               </span>
               <span className="font-sans text-xs tracking-wider text-charcoal-light group-hover:text-charcoal transition-colors">
                 {option.label}
@@ -249,16 +503,19 @@ export function InquiryForm() {
             </label>
           ))}
         </div>
-        {errors.serviceType && (
+        {errors.services && (
           <p className="mt-2 text-xs text-red-500">
-            {errors.serviceType.message}
+            {errors.services.message}
           </p>
         )}
       </fieldset>
 
       {/* ── Package Selection ── */}
       <fieldset>
-        <legend className={sectionTitleStyles}>Package Selection</legend>
+        <legend className={sectionTitleStyles}>What packages are you considering?</legend>
+        <p className="font-sans text-xs tracking-wider text-charcoal-light/70 -mt-4 mb-5">
+          Select all that apply.
+        </p>
         <div className="grid gap-3 sm:grid-cols-2">
           {packageOptions.map((option) => (
             <label
@@ -375,7 +632,7 @@ export function InquiryForm() {
               {(["yes", "no"] as const).map((val) => (
                 <label
                   key={val}
-                  className="flex items-center gap-2 cursor-pointer group"
+                  className="relative flex items-center gap-2 cursor-pointer group"
                 >
                   <input
                     type="radio"
@@ -383,9 +640,7 @@ export function InquiryForm() {
                     {...register("foodOnIsland")}
                     className="peer sr-only"
                   />
-                  <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-cream-dark peer-checked:border-gold transition-all duration-200">
-                    <span className="h-2 w-2 rounded-full bg-gold opacity-0 peer-checked:opacity-100 transition-opacity" />
-                  </span>
+                  <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-cream-dark peer-checked:border-gold peer-checked:bg-gold/20 transition-all duration-200 after:content-[''] after:h-2 after:w-2 after:rounded-full after:bg-gold after:scale-0 peer-checked:after:scale-100 after:transition-transform after:duration-200" />
                   <span className="font-sans text-xs tracking-wider text-charcoal-light group-hover:text-charcoal transition-colors capitalize">
                     {val}
                   </span>
@@ -483,19 +738,12 @@ export function InquiryForm() {
               </p>
             )}
           </div>
-          <div>
-            <label className={labelStyles}>Signature *</label>
-            <input
-              {...register("signature")}
-              className={`${inputStyles} font-serif italic text-lg`}
-              placeholder="Type your signature"
-            />
-            {errors.signature && (
-              <p className="mt-1 text-xs text-red-500">
-                {errors.signature.message}
-              </p>
-            )}
-          </div>
+          <SignaturePad
+            onChange={(dataUrl) =>
+              setValue("signature", dataUrl, { shouldValidate: true })
+            }
+            error={errors.signature?.message}
+          />
         </div>
       </fieldset>
 
@@ -512,8 +760,8 @@ export function InquiryForm() {
           type="submit"
           variant="primary"
           size="lg"
-          className="w-full"
-          disabled={submitStatus === "loading"}
+          className={`w-full transition-opacity duration-300 ${!isValid && submitStatus !== "loading" ? "opacity-40 cursor-not-allowed" : ""}`}
+          disabled={!isValid || submitStatus === "loading"}
         >
           {submitStatus === "loading" ? (
             <span className="flex items-center gap-2">
