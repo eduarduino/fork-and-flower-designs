@@ -174,21 +174,6 @@ function PackageCard({
   );
 }
 
-/* ───────────────────── Add-On Card ───────────────────── */
-
-function AddOnCard({ name, description }: { name: string; description: string }) {
-  return (
-    <div className="flex flex-col p-6 md:p-8 border border-cream-dark bg-white hover:border-gold/50 transition-all duration-300 hover:shadow-lg">
-      <h4 className="font-serif text-lg tracking-wide text-charcoal">
-        {name}
-      </h4>
-      <p className="mt-2 font-sans text-xs tracking-wider text-charcoal-light leading-relaxed">
-        {description}
-      </p>
-    </div>
-  );
-}
-
 /* ───────────────────── Main Export ───────────────────── */
 
 export function PackageCards() {
@@ -227,22 +212,32 @@ export function PackageCards() {
 
         {/* Premium Add-Ons */}
         <div>
-          <h3 className="font-serif text-2xl md:text-3xl text-charcoal tracking-wide text-center mb-4">
+          <h3 className="font-serif text-2xl md:text-3xl text-charcoal tracking-wide text-center mb-10">
             Premium Add-Ons
           </h3>
-          <p className="mx-auto max-w-md text-center font-sans text-xs tracking-wider text-charcoal-light mb-10">
-            Elevate your event with curated services available alongside any package.
-          </p>
-          <StaggerChildren
-            className="grid gap-6 sm:grid-cols-2 md:grid-cols-3"
-            staggerDelay={0.1}
-          >
-            {premiumAddOns.map((addon) => (
-              <StaggerItem key={addon.name}>
-                <AddOnCard name={addon.name} description={addon.description} />
-              </StaggerItem>
-            ))}
-          </StaggerChildren>
+          <div className="mx-auto max-w-lg">
+            <div className="p-8 md:p-10 border border-gold bg-cream-dark">
+              <p className="font-sans text-xs tracking-wider text-charcoal-light mb-6">
+                Elevate your event with curated services available alongside any package.
+              </p>
+              <div className="h-px bg-cream-dark my-6" />
+              <ul className="space-y-4">
+                {premiumAddOns.map((addon) => (
+                  <li key={addon.name} className="flex items-start gap-3">
+                    <span className="mt-0.5 text-gold text-sm">✦</span>
+                    <div>
+                      <span className="font-serif text-base tracking-wide text-charcoal">
+                        {addon.name}
+                      </span>
+                      <p className="mt-1 font-sans text-xs tracking-wider text-charcoal-light leading-relaxed">
+                        {addon.description}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
 
