@@ -37,17 +37,20 @@ export default function PackagesPage() {
       </Section>
 
       {/* CTA */}
-      <Section background="cream">
+      <Section background="charcoal">
         <div className="text-center">
-          <h2 className="font-serif text-3xl md:text-4xl font-light text-charcoal tracking-wide">
+          <h2 className="font-serif text-3xl md:text-4xl font-light text-cream tracking-wide">
             Need Something Custom?
           </h2>
-          <p className="mx-auto mt-5 max-w-md font-sans text-sm text-charcoal-light tracking-wider">
+          <div className="mx-auto mt-5 h-px w-16 bg-gold" />
+          <p className="mx-auto mt-6 max-w-md font-sans text-sm leading-relaxed text-cream/60 tracking-wider">
             Every event is unique. Contact us for a full pricing guide and custom
             package tailored to your needs.
           </p>
-          <div className="mt-8">
-            <Button href="/inquiry">Contact for Full Pricing Guide</Button>
+          <div className="mt-10">
+            <Button href="/inquiry" variant="secondary">
+              Contact for Full Pricing Guide
+            </Button>
           </div>
         </div>
       </Section>

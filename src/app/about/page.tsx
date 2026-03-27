@@ -45,17 +45,20 @@ export default function AboutPage() {
       </Section>
 
       {/* CTA */}
-      <Section background="cream-dark">
+      <Section background="charcoal">
         <div className="text-center">
-          <h2 className="font-serif text-3xl md:text-4xl font-light text-charcoal tracking-wide">
+          <h2 className="font-serif text-3xl md:text-4xl font-light text-cream tracking-wide">
             Ready to Collaborate?
           </h2>
-          <p className="mx-auto mt-5 max-w-md font-sans text-sm text-charcoal-light tracking-wider">
+          <div className="mx-auto mt-5 h-px w-16 bg-gold" />
+          <p className="mx-auto mt-6 max-w-md font-sans text-sm leading-relaxed text-cream/60 tracking-wider">
             We&apos;d love to hear about your next event and how we can bring your
             vision to life.
           </p>
-          <div className="mt-8">
-            <Button href="/inquiry">Start Your Inquiry</Button>
+          <div className="mt-10">
+            <Button href="/inquiry" variant="secondary">
+              Start Your Inquiry
+            </Button>
           </div>
         </div>
       </Section>
