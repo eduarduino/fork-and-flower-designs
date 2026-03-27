@@ -135,21 +135,35 @@ function GoldDivider() {
 function PackageCard({
   pkg,
   onViewDetails,
+  tier,
 }: {
   pkg: Package;
   onViewDetails?: (pkg: Package) => void;
+  tier?: number;
 }) {
   const isSignature = pkg.name.toLowerCase().includes("signature");
 
   return (
     <div
-      className={`relative flex flex-col h-full border transition-all duration-300 hover:shadow-lg ${
+      className={`relative flex flex-col h-full border transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
         isSignature || pkg.highlighted
-          ? "border-gold bg-cream-dark"
+          ? "border-cream-dark bg-cream-dark"
           : "border-cream-dark bg-white hover:border-gold/50"
       }`}
     >
+      {/* Top accent line for signature + highlighted cards */}
+      {(isSignature || pkg.highlighted) && (
+        <div className="h-[2px] bg-gold" />
+      )}
+
       <div className="flex flex-col h-full p-8 md:p-10">
+        {/* Tier number */}
+        {tier !== undefined && (
+          <p className="font-serif text-5xl text-charcoal/[0.06] leading-none mb-2">
+            {String(tier).padStart(2, "0")}
+          </p>
+        )}
+
         {isSignature && (
           <p className="font-sans text-[10px] tracking-[0.2em] uppercase text-gold mb-3">
             Signature Experience
@@ -163,13 +177,13 @@ function PackageCard({
           {pkg.description}
         </p>
 
-        <div className="h-px my-6 bg-cream-dark" />
+        <div className="h-px my-6 bg-charcoal/[0.08]" />
 
         <ul className="space-y-3 flex-1">
           {pkg.includes.map((item) => (
             <li
               key={item}
-              className="flex items-start gap-3 font-sans text-xs tracking-wider text-charcoal-light"
+              className="flex items-start gap-3 font-sans text-[11px] tracking-wider text-charcoal-light/70"
             >
               <span className="mt-0.5 text-gold text-sm">✦</span>
               {item}
@@ -186,9 +200,9 @@ function PackageCard({
         {pkg.detailedDescription && onViewDetails && (
           <button
             onClick={() => onViewDetails(pkg)}
-            className="mt-6 self-start inline-flex items-center gap-2 font-sans text-[11px] tracking-[0.12em] uppercase text-gold hover:text-charcoal transition-colors"
+            className="mt-6 self-start inline-flex items-center gap-2 font-serif text-sm italic text-gold hover:text-charcoal transition-colors"
           >
-            <span className="border-b border-current pb-0.5">View Full Details</span>
+            <span>View full details</span>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.2">
               <path d="M5 3l4 4-4 4" />
             </svg>
@@ -217,9 +231,9 @@ export function PackageCards() {
               className="grid gap-8 md:grid-cols-3"
               staggerDelay={0.15}
             >
-              {category.packages.map((pkg) => (
+              {category.packages.map((pkg, idx) => (
                 <StaggerItem key={pkg.name}>
-                  <PackageCard pkg={pkg} onViewDetails={setSelectedPkg} />
+                  <PackageCard pkg={pkg} onViewDetails={setSelectedPkg} tier={idx + 1} />
                 </StaggerItem>
               ))}
             </StaggerChildren>
@@ -251,7 +265,7 @@ export function PackageCards() {
           >
             {premiumAddOns.map((addon) => (
               <StaggerItem key={addon.name}>
-                <div className="flex flex-col h-full p-8 md:p-10 border border-cream-dark bg-white hover:border-gold/50 transition-all duration-300 hover:shadow-lg">
+                <div className="flex flex-col h-full p-8 md:p-10 border border-cream-dark bg-white hover:border-gold/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                   <h4 className="font-serif text-2xl tracking-wide text-charcoal">
                     {addon.name}
                   </h4>
