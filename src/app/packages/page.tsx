@@ -24,9 +24,16 @@ export default function PackagesPage() {
       {/* Package Cards */}
       <Section background="white">
         <PackageCards />
-        <p className="mt-12 text-center font-sans text-xs tracking-wider text-charcoal-light">
-          Travel / delivery fee may apply to all packages.
-        </p>
+        <div className="mt-12 mx-auto max-w-xl space-y-3 text-center">
+          <p className="font-sans text-xs tracking-wider text-charcoal-light">
+            A non-refundable booking fee is required to secure your date:
+            $100–$250 for standard packages, $250–$400 for premium packages.
+          </p>
+          <p className="font-sans text-xs tracking-wider text-charcoal-light">
+            A designer fee applies to all bookings. Travel / delivery fee may
+            apply.
+          </p>
+        </div>
       </Section>
 
       {/* CTA */}
