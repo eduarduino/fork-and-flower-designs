@@ -202,6 +202,8 @@ export function InquiryForm() {
   });
 
   const phoneValue = watch("phone");
+  const startTimeValue = watch("startTime");
+  const eventTypeValue = watch("eventType");
 
   // Date dropdowns state
   const [dateMonth, setDateMonth] = useState("");
@@ -286,7 +288,7 @@ export function InquiryForm() {
     "w-full bg-transparent border-b border-cream-dark focus:border-gold outline-none py-3 font-sans text-base md:text-sm tracking-wider text-charcoal placeholder:text-charcoal-light/50 transition-colors duration-300";
 
   const selectStyles =
-    `${inputStyles} cursor-pointer appearance-none rounded-none pr-5`;
+    `${inputStyles} cursor-pointer appearance-none rounded-none pr-5 tracking-normal text-sm md:text-sm`;
 
   const labelStyles =
     "font-sans text-[10px] tracking-[0.2em] uppercase text-charcoal-light";
@@ -381,7 +383,7 @@ export function InquiryForm() {
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div className="relative">
                   <select
-                    className={selectStyles}
+                    className={`${selectStyles} ${dateMonth ? "text-charcoal" : "text-charcoal-light/50"}`}
                     value={dateMonth}
                     onChange={(e) => {
                       setDateMonth(e.target.value);
@@ -401,7 +403,7 @@ export function InquiryForm() {
                 </div>
                 <div className="relative">
                   <select
-                    className={selectStyles}
+                    className={`${selectStyles} ${dateDay ? "text-charcoal" : "text-charcoal-light/50"}`}
                     value={dateDay}
                     onChange={(e) => {
                       setDateDay(e.target.value);
@@ -421,7 +423,7 @@ export function InquiryForm() {
                 </div>
                 <div className="relative">
                   <select
-                    className={selectStyles}
+                    className={`${selectStyles} ${dateYear ? "text-charcoal" : "text-charcoal-light/50"}`}
                     value={dateYear}
                     onChange={(e) => {
                       setDateYear(e.target.value);
@@ -451,7 +453,7 @@ export function InquiryForm() {
               <div className="relative">
                 <select
                   {...register("startTime")}
-                  className={selectStyles}
+                  className={`${selectStyles} ${startTimeValue ? "text-charcoal" : "text-charcoal-light/50"}`}
                   defaultValue=""
                 >
                   <option value="" disabled>
@@ -482,7 +484,7 @@ export function InquiryForm() {
               <div className="relative">
                 <select
                   {...register("eventType")}
-                  className={selectStyles}
+                  className={`${selectStyles} ${eventTypeValue ? "text-charcoal" : "text-charcoal-light/50"}`}
                   defaultValue=""
                 >
                   <option value="" disabled>
