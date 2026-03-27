@@ -1,4 +1,50 @@
+"use client";
+
+import { useState, useCallback } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+
+function ForkSVG({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 80"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      {/* Left prong */}
+      <path
+        d="M6 2 L6 24 Q6 30 12 32"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      {/* Center prong */}
+      <path
+        d="M12 2 L12 30"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      {/* Right prong */}
+      <path
+        d="M18 2 L18 24 Q18 30 12 32"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      {/* Handle */}
+      <path
+        d="M12 32 L12 78"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+      {/* Handle base */}
+      <ellipse cx="12" cy="78" rx="2.5" ry="1.5" fill="currentColor" />
+    </svg>
+  );
+}
 
 interface ButtonProps {
   children: React.ReactNode;
@@ -9,6 +55,7 @@ interface ButtonProps {
   type?: "button" | "submit";
   disabled?: boolean;
   onClick?: () => void;
+  forkAnimation?: boolean;
 }
 
 export function Button({
@@ -20,7 +67,25 @@ export function Button({
   type = "button",
   disabled = false,
   onClick,
+  forkAnimation = true,
 }: ButtonProps) {
+  const [isStabbing, setIsStabbing] = useState(false);
+
+  const handleClick = useCallback(
+    (e?: React.MouseEvent) => {
+      if (isStabbing || disabled) return;
+      setIsStabbing(true);
+      if (href && e) e.preventDefault();
+
+      setTimeout(() => {
+        setIsStabbing(false);
+        if (onClick) onClick();
+        if (href) window.location.href = href;
+      }, 600);
+    },
+    [isStabbing, disabled, onClick, href]
+  );
+
   const baseStyles =
     "inline-flex items-center justify-center font-sans tracking-[0.15em] uppercase transition-all duration-300 ease-out";
 
@@ -41,10 +106,56 @@ export function Button({
 
   const classes = `${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`;
 
+  const content = (
+    <>
+      {forkAnimation && (
+        <AnimatePresence>
+          {isStabbing && (
+            <motion.div
+              className="absolute inset-0 flex justify-center pointer-events-none z-20"
+              initial={{ y: "-100%" }}
+              animate={{ y: ["-100%", "5%", "-2%", "2%"] }}
+              exit={{ y: "-120%", opacity: 0 }}
+              transition={{
+                y: {
+                  duration: 0.35,
+                  times: [0, 0.5, 0.7, 1],
+                  ease: "easeOut",
+                },
+                exit: { duration: 0.25, ease: "easeIn" },
+              }}
+            >
+              <ForkSVG className="h-full w-5 text-gold drop-shadow-sm" />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
+      <motion.span
+        className="relative z-10"
+        animate={
+          isStabbing
+            ? {
+                y: [0, 2, -1, 1, 0],
+                transition: { duration: 0.3, delay: 0.2 },
+              }
+            : {}
+        }
+      >
+        {children}
+      </motion.span>
+    </>
+  );
+
   if (href) {
     return (
-      <Link href={href} className={classes}>
-        {children}
+      <Link
+        href={href}
+        className={`relative overflow-hidden ${classes}`}
+        onClick={(e) => {
+          if (forkAnimation) handleClick(e);
+        }}
+      >
+        {content}
       </Link>
     );
   }
@@ -52,11 +163,11 @@ export function Button({
   return (
     <button
       type={type}
-      className={classes}
+      className={`relative overflow-hidden ${classes}`}
       disabled={disabled}
-      onClick={onClick}
+      onClick={() => handleClick()}
     >
-      {children}
+      {content}
     </button>
   );
 }
