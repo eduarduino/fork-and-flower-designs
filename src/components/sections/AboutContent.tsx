@@ -29,15 +29,17 @@ export function AboutContent() {
         <div className="mt-4 h-px w-10 bg-gold" />
         <div className="mt-6 space-y-4 font-sans text-sm leading-relaxed text-charcoal-light tracking-wider">
           <p>
-            With a lifelong passion for design and a deep love for bringing
-            people together, I founded Fork & Flower Designs to merge two of my
-            greatest joys — creating beautiful spaces and celebrating life&apos;s
-            moments.
+            I&apos;ve always been drawn to creating things — whether it was
+            rearranging a room, styling a table for a dinner party, or putting
+            together a beautiful spread for friends and family. Flowers, food,
+            and gathering have always been at the center of how I show love.
           </p>
           <p>
-            Every event I style is a reflection of intentional design — from the
-            curve of a floral stem to the texture of a linen napkin. I believe
-            that the details are what transform a gathering into a memory.
+            Fork &amp; Flower started as a passion project — a way to combine my
+            love for floral design, tablescaping, and entertaining into
+            something meaningful. What began as styling my own events quickly
+            turned into something bigger when friends and family started asking
+            me to bring that same magic to their gatherings.
           </p>
           <p>
             Based in New Jersey, I work with clients throughout the surrounding

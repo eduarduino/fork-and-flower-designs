@@ -25,17 +25,16 @@ export default function AboutPage() {
       <Section background="white">
         <div className="mx-auto max-w-3xl text-center">
           <p className="font-serif text-xl md:text-2xl leading-relaxed text-charcoal font-light tracking-wide">
-            Fork & Flower Designs is a mobile custom event service dedicated to
-            creating curated tables and serving islands for at-home events —
-            blending florals, props, and decor into elevated, ready-to-serve
-            moments.
+            Fork &amp; Flower is a mobile event-decorating service, based in New
+            Jersey, that specializes in creating beautiful, floral-forward
+            tablescapes and island styling for intimate at-home gatherings.
           </p>
           <div className="mx-auto mt-8 h-px w-16 bg-gold" />
           <p className="mt-8 font-sans text-sm leading-relaxed text-charcoal-light tracking-wider">
-            We believe that every gathering, no matter the size, deserves to feel
-            intentional and beautiful. From intimate dinner parties to milestone
-            celebrations, we bring the artistry so you can focus on what matters
-            most — the people around your table.
+            We bring the design, the florals, and the styling to you — so all
+            you have to do is gather, celebrate, and enjoy. Whether it&apos;s a
+            birthday dinner, a holiday gathering, or a shower, we transform your
+            space into something warm, elevated, and unforgettable.
           </p>
         </div>
       </Section>
