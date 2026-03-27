@@ -4,7 +4,7 @@ export const navLinks = [
   { label: "Services", href: "/services" },
   { label: "Packages", href: "/packages" },
   { label: "Gallery", href: "/gallery" },
-  { label: "Inquiry", href: "/inquiry" },
+  { label: "Event Inquiry", href: "/inquiry" },
 ] as const;
 
 export const socialLinks = {
