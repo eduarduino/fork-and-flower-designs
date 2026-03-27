@@ -143,14 +143,12 @@ function PackageCard({
   const isHighlighted = pkg.highlighted && !isSignature;
 
   // Tier 1: Clean, minimal border
-  // Tier 2 (highlighted): Gold left accent bar
-  // Tier 3 (signature): Full gold border, soft resting shadow
+  // Tier 2 (highlighted): Same border, no special treatment
+  // Tier 3 (signature): Gold left accent bar + soft resting shadow
 
   const cardClasses = isSignature
-    ? "border-gold shadow-md bg-cream-dark"
-    : isHighlighted
-      ? "border-cream-dark border-l-[3px] border-l-gold bg-cream-dark"
-      : "border-cream-dark bg-cream-dark";
+    ? "border-cream-dark border-l-[3px] border-l-gold shadow-md bg-cream-dark"
+    : "border-cream-dark bg-cream-dark";
 
   return (
     <div
