@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { navLinks } from "@/data/navigation";
+import { navLinks, socialLinks } from "@/data/navigation";
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -69,6 +69,33 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
                 </Link>
               </motion.div>
             ))}
+
+            <motion.a
+              href={socialLinks.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 + navLinks.length * 0.08 }}
+              className="mt-4 inline-flex items-center gap-2 font-sans text-xs tracking-[0.2em] uppercase text-charcoal hover:text-gold transition-colors duration-300"
+              aria-label="Follow us on Instagram"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="2" y="2" width="20" height="20" rx="5" />
+                <circle cx="12" cy="12" r="5" />
+                <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+              </svg>
+              <span>Instagram</span>
+            </motion.a>
           </div>
         </motion.div>
       )}
