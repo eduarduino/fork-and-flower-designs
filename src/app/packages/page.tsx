@@ -26,12 +26,13 @@ export default function PackagesPage() {
         <PackageCards />
         <div className="mt-12 mx-auto max-w-xl space-y-3 text-center">
           <p className="font-sans text-xs tracking-wider text-charcoal-light">
-            A non-refundable booking fee is required to secure your date:
-            $100–$250 for standard packages, $250–$400 for premium packages.
+            A non-refundable styling fee is required to secure your event date.
+            This covers design time, planning, and floral sourcing:
+            $100–$250 for smaller events, $250–$400 for premium or larger setups.
           </p>
           <p className="font-sans text-xs tracking-wider text-charcoal-light">
-            A designer fee applies to all bookings. Travel / delivery fee may
-            apply.
+            A designer fee also applies to honor the time and creative work that
+            goes into making your event memorable. Travel / delivery fee may apply.
           </p>
         </div>
       </Section>

@@ -39,6 +39,12 @@ function PackageCard({ pkg }: { pkg: Package }) {
           </li>
         ))}
       </ul>
+
+      {pkg.perfectFor && (
+        <p className="mt-6 font-serif text-sm italic text-charcoal-light/80">
+          {pkg.perfectFor}
+        </p>
+      )}
     </div>
   );
 }
