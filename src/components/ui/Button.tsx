@@ -125,7 +125,9 @@ export function Button({
                 exit: { duration: 0.25, ease: "easeIn" },
               }}
             >
-              <ForkSVG className="h-full w-5 text-gold drop-shadow-sm" />
+              <ForkSVG className={`h-full w-5 drop-shadow-sm ${
+                variant === "primary" ? "text-cream" : variant === "secondary" ? "text-charcoal" : "text-gold"
+              }`} />
             </motion.div>
           )}
         </AnimatePresence>
