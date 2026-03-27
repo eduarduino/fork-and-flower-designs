@@ -147,7 +147,7 @@ function PackageCard({
   // Premium (full home): Full gold border all around + shadow
 
   const cardClasses = isFullHome
-    ? "border-[2.2px] border-gold shadow-md bg-cream-dark"
+    ? "border-[2.5px] border-gold shadow-md bg-cream-dark"
     : isSignature
       ? "border-cream-dark border-l-[3px] border-l-gold shadow-md bg-cream-dark"
       : "border-cream-dark bg-cream-dark";
