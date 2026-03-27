@@ -87,7 +87,7 @@ export function Button({
   );
 
   const baseStyles =
-    "inline-flex items-center justify-center font-sans tracking-[0.15em] uppercase transition-all duration-300 ease-out";
+    "inline-flex min-h-[44px] touch-manipulation items-center justify-center font-sans tracking-[0.15em] uppercase transition-all duration-300 ease-out";
 
   const variants = {
     primary:

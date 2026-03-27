@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import {
@@ -185,7 +185,7 @@ export function InquiryForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors },
     setValue,
     watch,
     reset,
@@ -230,11 +230,32 @@ export function InquiryForm() {
 
       if (!response.ok) throw new Error("Failed to submit");
 
-      setSubmitStatus("success");
       reset();
+      setDateMonth("");
+      setDateDay("");
+      setDateYear("");
+      setSubmitStatus("success");
     } catch {
       setSubmitStatus("error");
     }
+  };
+
+  const onInvalid = (formErrors: FieldErrors<InquiryFormData>) => {
+    const firstErrorField = Object.keys(formErrors)[0] as
+      | keyof InquiryFormData
+      | undefined;
+
+    if (!firstErrorField) return;
+
+    const target = document.getElementById(`field-${firstErrorField}`);
+    if (!target) return;
+
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    const focusable = target.querySelector<HTMLElement>(
+      "input, select, textarea, button, canvas, [tabindex]:not([tabindex='-1'])"
+    );
+    focusable?.focus?.();
   };
 
   if (submitStatus === "success") {
@@ -262,7 +283,10 @@ export function InquiryForm() {
   }
 
   const inputStyles =
-    "w-full bg-transparent border-b border-cream-dark focus:border-gold outline-none py-3 font-sans text-sm tracking-wider text-charcoal placeholder:text-charcoal-light/50 transition-colors duration-300";
+    "w-full bg-transparent border-b border-cream-dark focus:border-gold outline-none py-3 font-sans text-base md:text-sm tracking-wider text-charcoal placeholder:text-charcoal-light/50 transition-colors duration-300";
+
+  const selectStyles =
+    `${inputStyles} cursor-pointer appearance-none rounded-none pr-5`;
 
   const labelStyles =
     "font-sans text-[10px] tracking-[0.2em] uppercase text-charcoal-light";
@@ -271,13 +295,13 @@ export function InquiryForm() {
     "font-serif text-lg md:text-xl text-charcoal tracking-wide mb-6 pb-2 border-b border-cream-dark";
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
+    <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-12">
       {/* ── Contact Information ── */}
       <fieldset>
         <legend className={sectionTitleStyles}>Contact Information</legend>
         <div className="space-y-8">
           <div className="grid gap-8 md:grid-cols-2">
-            <div>
+            <div id="field-firstName">
               <label className={labelStyles}>First Name *</label>
               <input
                 {...register("firstName")}
@@ -290,7 +314,7 @@ export function InquiryForm() {
                 </p>
               )}
             </div>
-            <div>
+            <div id="field-lastName">
               <label className={labelStyles}>Last Name *</label>
               <input
                 {...register("lastName")}
@@ -305,7 +329,7 @@ export function InquiryForm() {
             </div>
           </div>
           <div className="grid gap-8 md:grid-cols-2">
-            <div>
+            <div id="field-phone">
               <label className={labelStyles}>Phone # *</label>
               <input
                 type="tel"
@@ -328,7 +352,7 @@ export function InquiryForm() {
                 </p>
               )}
             </div>
-            <div>
+            <div id="field-email">
               <label className={labelStyles}>Email *</label>
               <input
                 {...register("email")}
@@ -351,49 +375,70 @@ export function InquiryForm() {
         <legend className={sectionTitleStyles}>Event Details</legend>
         <div className="space-y-8">
           <div className="grid gap-8 md:grid-cols-2">
-            <div>
+            <div id="field-eventDate">
               <label className={labelStyles}>Event Date *</label>
               <input type="hidden" {...register("eventDate")} />
-              <div className="grid grid-cols-3 gap-3">
-                <select
-                  className={`${inputStyles} cursor-pointer`}
-                  value={dateMonth}
-                  onChange={(e) => {
-                    setDateMonth(e.target.value);
-                    syncDate(e.target.value, dateDay, dateYear);
-                  }}
-                >
-                  <option value="" disabled>Month</option>
-                  {months.map((name, i) => (
-                    <option key={name} value={String(i + 1)}>{name}</option>
-                  ))}
-                </select>
-                <select
-                  className={`${inputStyles} cursor-pointer`}
-                  value={dateDay}
-                  onChange={(e) => {
-                    setDateDay(e.target.value);
-                    syncDate(dateMonth, e.target.value, dateYear);
-                  }}
-                >
-                  <option value="" disabled>Day</option>
-                  {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => (
-                    <option key={d} value={String(d)}>{d}</option>
-                  ))}
-                </select>
-                <select
-                  className={`${inputStyles} cursor-pointer`}
-                  value={dateYear}
-                  onChange={(e) => {
-                    setDateYear(e.target.value);
-                    syncDate(dateMonth, dateDay, e.target.value);
-                  }}
-                >
-                  <option value="" disabled>Year</option>
-                  {getYearOptions().map((y) => (
-                    <option key={y} value={String(y)}>{y}</option>
-                  ))}
-                </select>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div className="relative">
+                  <select
+                    className={selectStyles}
+                    value={dateMonth}
+                    onChange={(e) => {
+                      setDateMonth(e.target.value);
+                      syncDate(e.target.value, dateDay, dateYear);
+                    }}
+                  >
+                    <option value="" disabled>Month</option>
+                    {months.map((name, i) => (
+                      <option key={name} value={String(i + 1)}>{name}</option>
+                    ))}
+                  </select>
+                  <span className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 text-charcoal-light/45">
+                    <svg className="h-2.5 w-2.5" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                      <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                </div>
+                <div className="relative">
+                  <select
+                    className={selectStyles}
+                    value={dateDay}
+                    onChange={(e) => {
+                      setDateDay(e.target.value);
+                      syncDate(dateMonth, e.target.value, dateYear);
+                    }}
+                  >
+                    <option value="" disabled>Day</option>
+                    {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => (
+                      <option key={d} value={String(d)}>{d}</option>
+                    ))}
+                  </select>
+                  <span className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 text-charcoal-light/45">
+                    <svg className="h-2.5 w-2.5" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                      <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                </div>
+                <div className="relative">
+                  <select
+                    className={selectStyles}
+                    value={dateYear}
+                    onChange={(e) => {
+                      setDateYear(e.target.value);
+                      syncDate(dateMonth, dateDay, e.target.value);
+                    }}
+                  >
+                    <option value="" disabled>Year</option>
+                    {getYearOptions().map((y) => (
+                      <option key={y} value={String(y)}>{y}</option>
+                    ))}
+                  </select>
+                  <span className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 text-charcoal-light/45">
+                    <svg className="h-2.5 w-2.5" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                      <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                </div>
               </div>
               {errors.eventDate && (
                 <p className="mt-1 text-xs text-red-500">
@@ -401,22 +446,29 @@ export function InquiryForm() {
                 </p>
               )}
             </div>
-            <div>
+            <div id="field-startTime">
               <label className={labelStyles}>Start Time *</label>
-              <select
-                {...register("startTime")}
-                className={`${inputStyles} cursor-pointer`}
-                defaultValue=""
-              >
-                <option value="" disabled>
-                  Select a time
-                </option>
-                {timeSlots.map((slot) => (
-                  <option key={slot} value={slot}>
-                    {slot}
+              <div className="relative">
+                <select
+                  {...register("startTime")}
+                  className={selectStyles}
+                  defaultValue=""
+                >
+                  <option value="" disabled>
+                    Select a time
                   </option>
-                ))}
-              </select>
+                  {timeSlots.map((slot) => (
+                    <option key={slot} value={slot}>
+                      {slot}
+                    </option>
+                  ))}
+                </select>
+                <span className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 text-charcoal-light/45">
+                  <svg className="h-2.5 w-2.5" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                    <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+              </div>
               {errors.startTime && (
                 <p className="mt-1 text-xs text-red-500">
                   {errors.startTime.message}
@@ -425,29 +477,36 @@ export function InquiryForm() {
             </div>
           </div>
           <div className="grid gap-8 md:grid-cols-2">
-            <div>
+            <div id="field-eventType">
               <label className={labelStyles}>Type of Event *</label>
-              <select
-                {...register("eventType")}
-                className={`${inputStyles} cursor-pointer`}
-                defaultValue=""
-              >
-                <option value="" disabled>
-                  Select event type
-                </option>
-                {eventTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
+              <div className="relative">
+                <select
+                  {...register("eventType")}
+                  className={selectStyles}
+                  defaultValue=""
+                >
+                  <option value="" disabled>
+                    Select event type
                   </option>
-                ))}
-              </select>
+                  {eventTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+                <span className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 text-charcoal-light/45">
+                  <svg className="h-2.5 w-2.5" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                    <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+              </div>
               {errors.eventType && (
                 <p className="mt-1 text-xs text-red-500">
                   {errors.eventType.message}
                 </p>
               )}
             </div>
-            <div>
+            <div id="field-guestCount">
               <label className={labelStyles}># of Guests *</label>
               <input
                 {...register("guestCount")}
@@ -467,7 +526,7 @@ export function InquiryForm() {
       </fieldset>
 
       {/* ── Services ── */}
-      <fieldset>
+      <fieldset id="field-services">
         <legend className={sectionTitleStyles}>What services are you interested in?</legend>
         <p className="font-sans text-xs tracking-wider text-charcoal-light/70 -mt-4 mb-5">
           Select all that apply.
@@ -511,7 +570,7 @@ export function InquiryForm() {
       </fieldset>
 
       {/* ── Package Selection ── */}
-      <fieldset>
+      <fieldset id="field-packages">
         <legend className={sectionTitleStyles}>What packages are you considering?</legend>
         <p className="font-sans text-xs tracking-wider text-charcoal-light/70 -mt-4 mb-5">
           Select all that apply.
@@ -579,7 +638,7 @@ export function InquiryForm() {
             <textarea
               {...register("mustHaveElements")}
               className={`${inputStyles} resize-none`}
-              rows={3}
+              rows={1}
               placeholder="Candles, specific flowers, charger plates, table runners..."
             />
           </div>
@@ -624,7 +683,7 @@ export function InquiryForm() {
             ))}
           </div>
 
-          <div>
+          <div id="field-foodOnIsland">
             <label className={`${labelStyles} block mb-3`}>
               Will food be displayed on the island? *
             </label>
@@ -660,7 +719,10 @@ export function InquiryForm() {
       <fieldset>
         <legend className={sectionTitleStyles}>Acknowledgements</legend>
         <div className="space-y-4">
-          <label className="flex items-start gap-3 cursor-pointer group">
+          <label
+            id="field-acknowledgeBookingFee"
+            className="flex items-start gap-3 cursor-pointer group"
+          >
             <input
               type="checkbox"
               {...register("acknowledgeBookingFee")}
@@ -690,7 +752,10 @@ export function InquiryForm() {
             </p>
           )}
 
-          <label className="flex items-start gap-3 cursor-pointer group">
+          <label
+            id="field-acknowledgeAvailability"
+            className="flex items-start gap-3 cursor-pointer group"
+          >
             <input
               type="checkbox"
               {...register("acknowledgeAvailability")}
@@ -725,7 +790,7 @@ export function InquiryForm() {
       <fieldset>
         <legend className={sectionTitleStyles}>Signature</legend>
         <div className="space-y-8">
-          <div>
+          <div id="field-printName">
             <label className={labelStyles}>Print Name *</label>
             <input
               {...register("printName")}
@@ -738,12 +803,14 @@ export function InquiryForm() {
               </p>
             )}
           </div>
-          <SignaturePad
-            onChange={(dataUrl) =>
-              setValue("signature", dataUrl, { shouldValidate: true })
-            }
-            error={errors.signature?.message}
-          />
+          <div id="field-signature">
+            <SignaturePad
+              onChange={(dataUrl) =>
+                setValue("signature", dataUrl, { shouldValidate: true })
+              }
+              error={errors.signature?.message}
+            />
+          </div>
         </div>
       </fieldset>
 
@@ -760,8 +827,8 @@ export function InquiryForm() {
           type="submit"
           variant="primary"
           size="lg"
-          className={`w-full transition-opacity duration-300 ${!isValid && submitStatus !== "loading" ? "opacity-40 cursor-not-allowed" : ""}`}
-          disabled={!isValid || submitStatus === "loading"}
+          className="w-full transition-opacity duration-300"
+          disabled={submitStatus === "loading"}
         >
           {submitStatus === "loading" ? (
             <span className="flex items-center gap-2">
