@@ -4,9 +4,9 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { InquiryForm } from "@/components/sections/InquiryForm";
 
 export const metadata: Metadata = {
-  title: "Inquiry",
+  title: "Event Inquiry",
   description:
-    "Ready to elevate your next gathering? Fill out our inquiry form and we'll get back to you within 48 hours.",
+    "Submit your event inquiry form and we'll get back to you within 48 hours to discuss your vision.",
 };
 
 export default function InquiryPage() {
@@ -15,8 +15,8 @@ export default function InquiryPage() {
       {/* Page Header */}
       <Section background="cream-dark" className="pt-32 md:pt-40">
         <SectionHeading
-          title="Ready to Elevate Your Next Gathering?"
-          subtitle="Tell us about your vision"
+          title="Event Inquiry Form"
+          subtitle="Tell us about your upcoming event"
         />
       </Section>
 
