@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 
 export function HeroSection() {
   return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-cream-dark px-6">
+    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-cream-dark marble-texture px-6">
       {/* Background pattern / placeholder for hero image */}
       <div className="absolute inset-0 opacity-10">
         <div

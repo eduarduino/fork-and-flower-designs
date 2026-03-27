@@ -14,16 +14,16 @@ export function Section({
   const backgrounds = {
     cream: "bg-cream",
     white: "bg-white",
-    "cream-dark": "bg-cream-dark",
+    "cream-dark": "bg-cream-dark marble-texture",
     charcoal: "bg-charcoal text-cream",
   };
 
   return (
     <section
       id={id}
-      className={`px-6 py-20 md:py-28 lg:py-32 ${backgrounds[background]} ${className}`}
+      className={`px-6 py-20 md:py-28 lg:py-32 overflow-hidden ${backgrounds[background]} ${className}`}
     >
-      <div className="mx-auto max-w-6xl">{children}</div>
+      <div className="relative z-10 mx-auto max-w-6xl">{children}</div>
     </section>
   );
 }
