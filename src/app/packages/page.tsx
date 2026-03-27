@@ -24,17 +24,6 @@ export default function PackagesPage() {
       {/* Package Cards */}
       <Section background="white">
         <PackageCards />
-        <div className="mt-12 mx-auto max-w-xl space-y-3 text-center">
-          <p className="font-sans text-xs tracking-wider text-charcoal-light">
-            A non-refundable styling fee is required to secure your event date.
-            This covers design time, planning, and floral sourcing:
-            $100–$250 for smaller events, $250–$400 for premium or larger setups.
-          </p>
-          <p className="font-sans text-xs tracking-wider text-charcoal-light">
-            A designer fee also applies to honor the time and creative work that
-            goes into making your event memorable. Travel / delivery fee may apply.
-          </p>
-        </div>
       </Section>
 
       {/* CTA */}
@@ -52,6 +41,16 @@ export default function PackagesPage() {
             <Button href="/inquiry" variant="secondary">
               Contact for Full Pricing Guide
             </Button>
+          </div>
+          <div className="mx-auto mt-12 max-w-lg space-y-2">
+            <p className="font-sans text-[10px] tracking-[0.12em] uppercase text-cream/40">
+              A non-refundable styling fee of $100–$250 (smaller events) or
+              $250–$400 (premium setups) secures your date and covers design
+              time, planning, and floral sourcing.
+            </p>
+            <p className="font-sans text-[10px] tracking-[0.12em] uppercase text-cream/40">
+              A designer fee also applies. Travel / delivery fee may apply.
+            </p>
           </div>
         </div>
       </Section>

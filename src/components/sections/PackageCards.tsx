@@ -118,6 +118,18 @@ function PackageDetailModal({
   );
 }
 
+/* ───────────────────── Gold Divider ───────────────────── */
+
+function GoldDivider() {
+  return (
+    <div className="flex items-center justify-center gap-4 py-4">
+      <div className="h-px w-16 bg-gold/30" />
+      <span className="text-gold text-xs">✦</span>
+      <div className="h-px w-16 bg-gold/30" />
+    </div>
+  );
+}
+
 /* ───────────────────── Package Card ───────────────────── */
 
 function PackageCard({
@@ -127,49 +139,73 @@ function PackageCard({
   pkg: Package;
   onViewDetails?: (pkg: Package) => void;
 }) {
+  const isSignature = pkg.name.toLowerCase().includes("signature");
+
   return (
     <div
-      className={`relative flex flex-col h-full p-8 md:p-10 border transition-all duration-300 hover:shadow-lg ${
-        pkg.highlighted
-          ? "border-gold bg-cream-dark"
-          : "border-cream-dark bg-white hover:border-gold/50"
+      className={`relative flex flex-col h-full border transition-all duration-300 hover:shadow-lg ${
+        isSignature
+          ? "border-gold bg-charcoal text-cream"
+          : pkg.highlighted
+            ? "border-gold bg-cream-dark"
+            : "border-cream-dark bg-white hover:border-gold/50"
       }`}
     >
-      <h3 className="font-serif text-2xl tracking-wide text-charcoal">
-        {pkg.name}
-      </h3>
-      <p className="mt-2 font-sans text-xs tracking-wider text-charcoal-light">
-        {pkg.description}
-      </p>
+      {/* Gold accent bar on signature cards */}
+      {isSignature && (
+        <div className="h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent" />
+      )}
 
-      <div className="h-px bg-cream-dark my-6" />
+      <div className="flex flex-col h-full p-8 md:p-10">
+        {isSignature && (
+          <p className="font-sans text-[10px] tracking-[0.2em] uppercase text-gold mb-3">
+            Signature Experience
+          </p>
+        )}
 
-      <ul className="space-y-3 flex-1">
-        {pkg.includes.map((item) => (
-          <li
-            key={item}
-            className="flex items-start gap-3 font-sans text-xs tracking-wider text-charcoal-light"
-          >
-            <span className="mt-0.5 text-gold text-sm">✦</span>
-            {item}
-          </li>
-        ))}
-      </ul>
-
-      {pkg.perfectFor && (
-        <p className="mt-6 font-serif text-sm italic text-charcoal-light/80">
-          {pkg.perfectFor}
+        <h3 className={`font-serif text-2xl tracking-wide ${isSignature ? "text-cream" : "text-charcoal"}`}>
+          {pkg.name}
+        </h3>
+        <p className={`mt-2 font-sans text-xs tracking-wider ${isSignature ? "text-cream/60" : "text-charcoal-light"}`}>
+          {pkg.description}
         </p>
-      )}
 
-      {pkg.detailedDescription && onViewDetails && (
-        <button
-          onClick={() => onViewDetails(pkg)}
-          className="mt-6 self-start font-sans text-xs tracking-wider text-gold hover:text-charcoal transition-colors border-b border-gold/40 hover:border-charcoal/40 pb-0.5"
-        >
-          View Full Details
-        </button>
-      )}
+        <div className={`h-px my-6 ${isSignature ? "bg-gold/20" : "bg-cream-dark"}`} />
+
+        <ul className="space-y-3 flex-1">
+          {pkg.includes.map((item) => (
+            <li
+              key={item}
+              className={`flex items-start gap-3 font-sans text-xs tracking-wider ${isSignature ? "text-cream/70" : "text-charcoal-light"}`}
+            >
+              <span className="mt-0.5 text-gold text-sm">✦</span>
+              {item}
+            </li>
+          ))}
+        </ul>
+
+        {pkg.perfectFor && (
+          <p className={`mt-6 font-serif text-sm italic ${isSignature ? "text-cream/50" : "text-charcoal-light/80"}`}>
+            {pkg.perfectFor}
+          </p>
+        )}
+
+        {pkg.detailedDescription && onViewDetails && (
+          <button
+            onClick={() => onViewDetails(pkg)}
+            className={`mt-6 self-start inline-flex items-center gap-2 font-sans text-[11px] tracking-[0.12em] uppercase transition-colors ${
+              isSignature
+                ? "text-gold hover:text-cream"
+                : "text-gold hover:text-charcoal"
+            }`}
+          >
+            <span className="border-b border-current pb-0.5">View Full Details</span>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.2">
+              <path d="M5 3l4 4-4 4" />
+            </svg>
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -182,8 +218,9 @@ export function PackageCards() {
   return (
     <>
       <div className="space-y-16">
-        {packageCategories.map((category) => (
+        {packageCategories.map((category, i) => (
           <div key={category.category}>
+            {i > 0 && <GoldDivider />}
             <h3 className="font-serif text-2xl md:text-3xl text-charcoal tracking-wide text-center mb-10">
               {category.category}
             </h3>
@@ -200,6 +237,8 @@ export function PackageCards() {
           </div>
         ))}
 
+        <GoldDivider />
+
         {/* Full Home Experience */}
         <div>
           <h3 className="font-serif text-2xl md:text-3xl text-charcoal tracking-wide text-center mb-10">
@@ -209,6 +248,8 @@ export function PackageCards() {
             <PackageCard pkg={fullHomeExperience} onViewDetails={setSelectedPkg} />
           </div>
         </div>
+
+        <GoldDivider />
 
         {/* Premium Add-Ons */}
         <div>
