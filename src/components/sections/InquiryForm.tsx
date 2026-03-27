@@ -26,6 +26,7 @@ export function InquiryForm() {
     reset,
   } = useForm<InquiryFormData>({
     resolver: zodResolver(inquirySchema),
+    mode: "onTouched",
     defaultValues: {
       packages: [],
       addOns: [],
