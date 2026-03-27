@@ -18,8 +18,11 @@ export function Footer() {
               </span>
             </Link>
             <p className="mt-4 font-sans text-xs tracking-wider text-cream/40 max-w-xs">
-              Curated event styling for elevated, intimate moments in the comfort
-              of your home.
+              Floral-forward event styling for intimate at-home gatherings.
+              A traveling service — no storefront.
+            </p>
+            <p className="mt-2 font-sans text-[10px] tracking-wider text-cream/30">
+              events@forkandflowerdesigns.com
             </p>
           </div>
 

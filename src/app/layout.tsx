@@ -20,18 +20,19 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: {
-    default: "Fork & Flower Designs | Luxury Event Styling",
+    default: "Fork & Flower Designs | Floral-Forward Event Styling",
     template: "%s | Fork & Flower Designs",
   },
   description:
-    "Curated tablescaping, floral artistry, and decor styling for elevated at-home events. Creating intimate, beautiful moments you'll remember.",
+    "Floral-forward event styling for intimate at-home gatherings. Creating warm, elevated tablescapes and island designs in New Jersey & surrounding areas.",
   keywords: [
     "event styling",
     "tablescaping",
     "floral design",
-    "luxury events",
+    "island styling",
     "home entertaining",
     "dinner party styling",
+    "New Jersey event styling",
   ],
   openGraph: {
     type: "website",
