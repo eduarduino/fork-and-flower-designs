@@ -296,6 +296,9 @@ export function InquiryForm() {
   const sectionTitleStyles =
     "font-serif text-lg md:text-xl text-charcoal tracking-wide mb-6 pb-2 border-b border-cream-dark";
 
+  const textAreaStyles =
+    `${inputStyles} resize-none overflow-hidden tracking-normal leading-relaxed`;
+
   return (
     <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-12">
       {/* ── Contact Information ── */}
@@ -621,17 +624,27 @@ export function InquiryForm() {
         <div className="space-y-8">
           <div>
             <label className={labelStyles}>Color Palette</label>
-            <input
+            <textarea
               {...register("colorPalette")}
-              className={inputStyles}
+              className={textAreaStyles}
+              rows={1}
+              onInput={(e) => {
+                e.currentTarget.style.height = "auto";
+                e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+              }}
               placeholder="e.g., blush & sage, neutrals, bold jewel tones..."
             />
           </div>
           <div>
             <label className={labelStyles}>Theme or Vibe</label>
-            <input
+            <textarea
               {...register("themeOrVibe")}
-              className={inputStyles}
+              className={textAreaStyles}
+              rows={1}
+              onInput={(e) => {
+                e.currentTarget.style.height = "auto";
+                e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+              }}
               placeholder="e.g., rustic elegance, modern minimalist, garden party..."
             />
           </div>
@@ -639,8 +652,12 @@ export function InquiryForm() {
             <label className={labelStyles}>Must-Have Elements</label>
             <textarea
               {...register("mustHaveElements")}
-              className={`${inputStyles} resize-none`}
+              className={textAreaStyles}
               rows={1}
+              onInput={(e) => {
+                e.currentTarget.style.height = "auto";
+                e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+              }}
               placeholder="Candles, specific flowers, charger plates, table runners..."
             />
           </div>
