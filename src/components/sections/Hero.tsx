@@ -25,7 +25,7 @@ export function HeroSection() {
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <span className="font-sans text-[10px] tracking-[0.4em] uppercase text-gold mb-4 block">
-            Luxury Event Styling
+            Floral-Forward Event Styling
           </span>
         </motion.div>
 
@@ -35,9 +35,9 @@ export function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
         >
-          Elevated Moments,
+          Floral-Forward Event Styling
           <br />
-          <span className="italic text-gold-dark">Beautifully Styled</span>
+          <span className="italic text-gold-dark">for Intimate Gatherings</span>
         </motion.h1>
 
         <motion.p
@@ -46,9 +46,9 @@ export function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
         >
-          Curated tablescaping, floral artistry, and decor styling
+          Creating warm, elevated tablescapes and island designs
           <br className="hidden sm:block" />
-          for intimate at-home gatherings.
+          that bring your home — and your moments — to life.
         </motion.p>
 
         <motion.div
@@ -78,7 +78,7 @@ export function HeroSection() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.75 }}
         >
-          New Jersey + Surrounding Areas
+          Serving New Jersey &amp; Surrounding Areas
         </motion.p>
       </div>
     </section>
