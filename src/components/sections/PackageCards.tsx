@@ -140,20 +140,32 @@ function PackageCard({
   onViewDetails?: (pkg: Package) => void;
 }) {
   const isSignature = pkg.name.toLowerCase().includes("signature");
+  const isHighlighted = pkg.highlighted && !isSignature;
+
+  // Tier 1: Clean, minimal
+  // Tier 2 (highlighted): Gold left bar, soft shadow, slight scale-up
+  // Tier 3 (signature): Full gold border, deeper shadow, label
+
+  const cardClasses = isSignature
+    ? "border-gold shadow-md bg-cream-dark"
+    : isHighlighted
+      ? "border-cream-dark border-l-[3px] border-l-gold shadow-sm bg-cream-dark md:scale-[1.03] md:z-10"
+      : "border-cream-dark bg-cream-dark";
 
   return (
     <div
-      className="relative flex flex-col h-full border border-cream-dark bg-cream-dark transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+      className={`relative flex flex-col h-full border transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${cardClasses}`}
     >
-      {/* Top accent line for signature + highlighted cards */}
-      {(isSignature || pkg.highlighted) && (
-        <div className="h-[2px] bg-gold" />
-      )}
-
       <div className="flex flex-col h-full p-8 md:p-10">
         {isSignature && (
           <p className="font-sans text-[10px] tracking-[0.2em] uppercase text-gold mb-3">
             Signature Experience
+          </p>
+        )}
+
+        {isHighlighted && (
+          <p className="font-sans text-[10px] tracking-[0.2em] uppercase text-gold mb-3">
+            Most Popular
           </p>
         )}
 
