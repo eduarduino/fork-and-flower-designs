@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { navLinks, socialLinks } from "@/data/navigation";
+import { navLinks } from "@/data/navigation";
 
 export function Footer() {
   return (
@@ -49,21 +49,6 @@ export function Footer() {
             &copy; {new Date().getFullYear()} Fork & Flower Designs. All rights
             reserved.
           </p>
-
-          {/* Social */}
-          <a
-            href={socialLinks.instagram}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-cream/40 hover:text-gold transition-colors duration-300"
-            aria-label="Follow us on Instagram"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="2" y="2" width="20" height="20" rx="5" />
-              <circle cx="12" cy="12" r="5" />
-              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
-            </svg>
-          </a>
         </div>
       </div>
     </footer>

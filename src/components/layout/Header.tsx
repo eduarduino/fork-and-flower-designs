@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { navLinks } from "@/data/navigation";
+import { navLinks, socialLinks } from "@/data/navigation";
 import { MobileNav } from "./MobileNav";
 
 export function Header() {
@@ -54,6 +54,19 @@ export function Header() {
                 {link.label}
               </Link>
             ))}
+            <a
+              href={socialLinks.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-charcoal hover:text-gold transition-colors duration-300"
+              aria-label="Follow us on Instagram"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" />
+                <circle cx="12" cy="12" r="5" />
+                <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+              </svg>
+            </a>
           </nav>
 
           {/* Mobile Hamburger */}

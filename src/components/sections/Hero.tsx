@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
-import { socialLinks } from "@/data/navigation";
 
 export function HeroSection() {
   return (
@@ -81,23 +80,6 @@ export function HeroSection() {
         >
           Serving New Jersey &amp; Surrounding Areas
         </motion.p>
-
-        <motion.a
-          href={socialLinks.instagram}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-5 inline-block text-charcoal-light/40 hover:text-gold transition-colors duration-300"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.9 }}
-          aria-label="Follow us on Instagram"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="2" y="2" width="20" height="20" rx="5" />
-            <circle cx="12" cy="12" r="5" />
-            <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
-          </svg>
-        </motion.a>
       </div>
     </section>
   );
