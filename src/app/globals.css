@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #FFFFFF;
+  --foreground: #3A320C;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-montserrat), system-ui, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-cormorant), Georgia, serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  overscroll-behavior-y: none;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #FFFFFF;
+}
+::-webkit-scrollbar-thumb {
+  background: #C9A96E;
+  border-radius: 3px;
+}
+
+::selection {
+  background: #EBDED4;
+  color: #3A320C;
+}
+
+/* Marble texture overlay — soft veining effect */
+.marble-texture {
+  position: relative;
+}
+.marble-texture::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image:
+    radial-gradient(ellipse 600px 300px at 15% 40%, #d4c4b8 0%, transparent 70%),
+    radial-gradient(ellipse 500px 250px at 85% 25%, #ddd0c6 0%, transparent 65%),
+    radial-gradient(ellipse 400px 200px at 50% 75%, #d4c4b8 0%, transparent 60%),
+    linear-gradient(160deg, transparent 35%, rgba(180, 165, 150, 0.3) 45%, transparent 55%),
+    linear-gradient(200deg, transparent 40%, rgba(200, 185, 170, 0.25) 50%, transparent 60%),
+    linear-gradient(70deg, transparent 50%, rgba(180, 165, 150, 0.2) 58%, transparent 65%);
+}
