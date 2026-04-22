@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { inquirySchema } from "@/lib/schemas/inquiry";
-import { sendOwnerNotification, sendClientConfirmation } from "@/lib/email";
+import {
+  sendOwnerNotification,
+  sendClientConfirmation,
+  canSendToArbitraryRecipients,
+} from "@/lib/email";
 
 // Simple in-memory rate limit: max 5 submissions per IP per minute
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -47,21 +51,28 @@ export async function POST(request: Request) {
 
     const data = result.data;
 
-    // Send emails (only if API key is configured)
     const apiKey = process.env.RESEND_API_KEY;
-    console.log("RESEND_API_KEY present:", !!apiKey, "length:", apiKey?.length);
     if (apiKey) {
-      try {
-        await Promise.all([
-          sendOwnerNotification(data),
-          sendClientConfirmation(data),
-        ]);
-        console.log("Emails sent successfully");
-      } catch (emailError) {
-        console.error("Email sending failed:", emailError);
+      const canSendToCustomer = canSendToArbitraryRecipients();
+
+      const tasks: Array<Promise<unknown>> = [sendOwnerNotification(data)];
+      const labels: string[] = ["ownerNotification"];
+
+      if (canSendToCustomer) {
+        tasks.push(sendClientConfirmation(data));
+        labels.push("clientConfirmation");
       }
+
+      const results = await Promise.allSettled(tasks);
+      results.forEach((r, i) => {
+        if (r.status === "fulfilled") {
+          console.log(`Email [${labels[i]}] sent`);
+        } else {
+          console.error(`Email [${labels[i]}] failed:`, r.reason);
+        }
+      });
     } else {
-      console.log("RESEND_API_KEY not configured. Inquiry data:", data);
+      console.warn("RESEND_API_KEY not configured — inquiry not emailed");
     }
 
     return NextResponse.json({ success: true });

@@ -4,6 +4,12 @@ function getResendClient() {
   return new Resend(process.env.RESEND_API_KEY);
 }
 
+export function canSendToArbitraryRecipients(): boolean {
+  if (process.env.FORCE_CLIENT_CONFIRMATION === "true") return true;
+  const from = process.env.FROM_EMAIL ?? "";
+  return from.length > 0 && !from.includes("resend.dev");
+}
+
 interface InquiryData {
   firstName: string;
   lastName: string;
@@ -38,11 +44,13 @@ export async function sendOwnerNotification(data: InquiryData) {
   const serviceList = data.services.map(s => serviceLabels[s] || s).join(", ");
   const addOnList = data.addOns?.length ? data.addOns.join(", ") : "None";
 
-  console.log("Sending owner notification to:", process.env.BUSINESS_EMAIL);
-  console.log("From:", process.env.FROM_EMAIL);
+  const from = process.env.FROM_EMAIL;
+  const to = process.env.BUSINESS_EMAIL;
+  if (!from) throw new Error("FROM_EMAIL is not configured");
+  if (!to) throw new Error("BUSINESS_EMAIL is not configured");
   const ownerResult = await resend.emails.send({
-    from: process.env.FROM_EMAIL || "Fork & Flower <noreply@forkandflower.com>",
-    to: process.env.BUSINESS_EMAIL || "",
+    from,
+    to,
     subject: `New Event Inquiry from ${fullName}`,
     html: `
       <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; color: #3A320C;">
@@ -97,16 +105,17 @@ export async function sendOwnerNotification(data: InquiryData) {
       </div>
     `,
   });
-  console.log("Owner notification result:", JSON.stringify(ownerResult));
+  if (ownerResult.error) throw new Error(ownerResult.error.message);
 }
 
 export async function sendClientConfirmation(data: InquiryData) {
   const resend = getResendClient();
   const fullName = `${data.firstName} ${data.lastName}`;
 
-  console.log("Sending client confirmation to:", data.email);
+  const from = process.env.FROM_EMAIL;
+  if (!from) throw new Error("FROM_EMAIL is not configured");
   const clientResult = await resend.emails.send({
-    from: process.env.FROM_EMAIL || "Fork & Flower <noreply@forkandflower.com>",
+    from,
     to: data.email,
     subject: "Thank you for your inquiry — Fork & Flower Designs",
     html: `
@@ -136,5 +145,5 @@ export async function sendClientConfirmation(data: InquiryData) {
       </div>
     `,
   });
-  console.log("Client confirmation result:", JSON.stringify(clientResult));
+  if (clientResult.error) throw new Error(clientResult.error.message);
 }

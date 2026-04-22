@@ -273,7 +273,7 @@ export function InquiryForm() {
         </h3>
         <p className="mt-4 font-sans text-sm text-charcoal-light tracking-wider">
           We&apos;ve received your event inquiry and will get back to you within
-          48 hours. Check your email for a confirmation.
+          48 hours.
         </p>
         <div className="mt-8">
           <Button onClick={() => setSubmitStatus("idle")} variant="outline">
