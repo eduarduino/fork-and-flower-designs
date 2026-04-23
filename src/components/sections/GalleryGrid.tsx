@@ -8,12 +8,78 @@ import {
   galleryCategories,
   type GalleryCategory,
 } from "@/data/gallery";
-import { useForkStab } from "@/hooks/useForkStab";
+import { useForkAnimatedAction } from "@/hooks/useForkAnimatedAction";
+
+type FilterCategory = (typeof galleryCategories)[number];
+type GalleryImageEntry = (typeof galleryImages)[number];
+
+function FilterButton({
+  cat,
+  isActive,
+  onSelect,
+}: {
+  cat: FilterCategory;
+  isActive: boolean;
+  onSelect: (value: GalleryCategory) => void;
+}) {
+  const handlers = useForkAnimatedAction({
+    mode: "action",
+    action: () => onSelect(cat.value),
+  });
+  return (
+    <button
+      onPointerDown={handlers.onPointerDown}
+      onClick={handlers.onClick}
+      className={`font-sans text-xs sm:text-[11px] tracking-[0.2em] uppercase transition-all duration-300 py-2 px-1 border-b ${
+        isActive
+          ? "text-charcoal border-gold"
+          : "text-charcoal-light border-transparent hover:text-charcoal hover:border-charcoal/20"
+      }`}
+    >
+      {cat.label}
+    </button>
+  );
+}
+
+function GalleryTile({
+  image,
+  onOpen,
+}: {
+  image: GalleryImageEntry;
+  onOpen: (id: string) => void;
+}) {
+  const handlers = useForkAnimatedAction({
+    mode: "action",
+    action: () => onOpen(image.id),
+  });
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      className="group cursor-pointer"
+      onPointerDown={handlers.onPointerDown}
+      onClick={handlers.onClick}
+    >
+      <div className="relative overflow-hidden bg-cream-dark aspect-[4/5]">
+        <Image
+          src={image.src}
+          alt={image.alt}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+        />
+        <div className="absolute inset-0 bg-charcoal/0 transition-all duration-500 group-hover:bg-charcoal/10" />
+      </div>
+    </motion.div>
+  );
+}
 
 export function GalleryGrid() {
   const [activeCategory, setActiveCategory] = useState<GalleryCategory>("all");
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
-  const { onPointerDown, onClick: onStabClick } = useForkStab();
 
   const filteredImages =
     activeCategory === "all"
@@ -29,18 +95,12 @@ export function GalleryGrid() {
       {/* Filter Bar */}
       <div className="flex flex-wrap justify-center gap-4 md:gap-6 mb-10 md:mb-14">
         {galleryCategories.map((cat) => (
-          <button
+          <FilterButton
             key={cat.value}
-            onClick={(e) => { onStabClick(e); setActiveCategory(cat.value); }}
-            onPointerDown={onPointerDown}
-            className={`font-sans text-xs sm:text-[11px] tracking-[0.2em] uppercase transition-all duration-300 py-2 px-1 border-b ${
-              activeCategory === cat.value
-                ? "text-charcoal border-gold"
-                : "text-charcoal-light border-transparent hover:text-charcoal hover:border-charcoal/20"
-            }`}
-          >
-            {cat.label}
-          </button>
+            cat={cat}
+            isActive={activeCategory === cat.value}
+            onSelect={setActiveCategory}
+          />
         ))}
       </div>
 
@@ -51,28 +111,11 @@ export function GalleryGrid() {
       >
         <AnimatePresence mode="popLayout">
           {filteredImages.map((image) => (
-            <motion.div
+            <GalleryTile
               key={image.id}
-              layout
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.35, ease: "easeOut" }}
-              className="group cursor-pointer"
-              onClick={(e) => { onStabClick(e); setLightboxImage(image.id); }}
-              onPointerDown={onPointerDown}
-            >
-              <div className="relative overflow-hidden bg-cream-dark aspect-[4/5]">
-                <Image
-                  src={image.src}
-                  alt={image.alt}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                />
-                <div className="absolute inset-0 bg-charcoal/0 transition-all duration-500 group-hover:bg-charcoal/10" />
-              </div>
-            </motion.div>
+              image={image}
+              onOpen={setLightboxImage}
+            />
           ))}
         </AnimatePresence>
       </motion.div>

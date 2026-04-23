@@ -3,11 +3,23 @@
 import Link from "next/link";
 import { navLinks } from "@/data/navigation";
 import { BrandLogo } from "@/components/brand/BrandLogo";
-import { useForkStab } from "@/hooks/useForkStab";
+import { useForkAnimatedAction } from "@/hooks/useForkAnimatedAction";
+
+function NavItem({ href, label }: { href: string; label: string }) {
+  const handlers = useForkAnimatedAction({ mode: "link", href });
+  return (
+    <Link
+      href={href}
+      onPointerDown={handlers.onPointerDown}
+      onClick={handlers.onClick}
+      className="font-sans text-xs tracking-[0.2em] uppercase text-cream/70 hover:text-gold transition-colors duration-300"
+    >
+      {label}
+    </Link>
+  );
+}
 
 export function Footer() {
-  const { onPointerDown, onClick: onStabClick } = useForkStab();
-
   return (
     <footer className="bg-charcoal text-cream px-6 py-16 md:py-20">
       <div className="mx-auto max-w-6xl">
@@ -28,15 +40,7 @@ export function Footer() {
           {/* Nav Links */}
           <nav className="flex flex-wrap justify-center gap-x-8 gap-y-3">
             {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onPointerDown={onPointerDown}
-                onClick={onStabClick}
-                className="font-sans text-xs tracking-[0.2em] uppercase text-cream/70 hover:text-gold transition-colors duration-300"
-              >
-                {link.label}
-              </Link>
+              <NavItem key={link.href} href={link.href} label={link.label} />
             ))}
           </nav>
         </div>

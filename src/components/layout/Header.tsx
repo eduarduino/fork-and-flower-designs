@@ -6,13 +6,36 @@ import { usePathname } from "next/navigation";
 import { navLinks, socialLinks } from "@/data/navigation";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { MobileNav } from "./MobileNav";
-import { useForkStab } from "@/hooks/useForkStab";
+import { useForkAnimatedAction } from "@/hooks/useForkAnimatedAction";
+
+function NavItem({
+  href,
+  label,
+  isActive,
+}: {
+  href: string;
+  label: string;
+  isActive: boolean;
+}) {
+  const handlers = useForkAnimatedAction({ mode: "link", href });
+  return (
+    <Link
+      href={href}
+      onPointerDown={handlers.onPointerDown}
+      onClick={handlers.onClick}
+      className={`font-sans text-[11px] tracking-[0.2em] uppercase transition-colors duration-300 hover:text-gold ${
+        isActive ? "text-gold" : "text-charcoal"
+      }`}
+    >
+      {label}
+    </Link>
+  );
+}
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
-  const { onPointerDown, onClick: onStabClick } = useForkStab();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -40,17 +63,12 @@ export function Header() {
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
-              <Link
+              <NavItem
                 key={link.href}
                 href={link.href}
-                onPointerDown={onPointerDown}
-                onClick={onStabClick}
-                className={`font-sans text-[11px] tracking-[0.2em] uppercase transition-colors duration-300 hover:text-gold ${
-                  pathname === link.href ? "text-gold" : "text-charcoal"
-                }`}
-              >
-                {link.label}
-              </Link>
+                label={link.label}
+                isActive={pathname === link.href}
+              />
             ))}
             <a
               href={socialLinks.instagram}

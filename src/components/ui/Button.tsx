@@ -1,10 +1,8 @@
 "use client";
 
-import { useCallback } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { useForkStab } from "@/hooks/useForkStab";
+import { useForkAnimatedAction } from "@/hooks/useForkAnimatedAction";
 
 interface ButtonProps {
   children: React.ReactNode;
@@ -18,8 +16,6 @@ interface ButtonProps {
   forkAnimation?: boolean;
 }
 
-const STAB_DELAY_MS = 650;
-
 export function Button({
   children,
   href,
@@ -31,29 +27,10 @@ export function Button({
   onClick,
   forkAnimation = true,
 }: ButtonProps) {
-  const { onClick: onStabClick } = useForkStab();
-  const router = useRouter();
-
-  const handleLinkClick = useCallback(
-    (e: React.MouseEvent) => {
-      if (disabled || !href) return;
-      if (forkAnimation) {
-        e.preventDefault();
-        onStabClick(e);
-        setTimeout(() => router.push(href), STAB_DELAY_MS);
-      }
-      if (onClick) onClick();
-    },
-    [disabled, href, forkAnimation, onClick, onStabClick, router],
-  );
-
-  const handleButtonClick = useCallback(
-    (e: React.MouseEvent) => {
-      if (disabled) return;
-      if (forkAnimation) onStabClick(e);
-      if (onClick) onClick();
-    },
-    [disabled, forkAnimation, onClick, onStabClick],
+  const animatedHandlers = useForkAnimatedAction(
+    href
+      ? { mode: "link", href, onBeforeNavigate: onClick }
+      : { mode: "action", action: () => onClick?.() },
   );
 
   const baseStyles =
@@ -86,12 +63,32 @@ export function Button({
     </motion.span>
   );
 
+  const animationActive = forkAnimation && !disabled;
+
   if (href) {
+    if (!animationActive) {
+      return (
+        <Link
+          href={href}
+          className={`relative overflow-hidden ${classes}`}
+          onClick={(e) => {
+            if (disabled) {
+              e.preventDefault();
+              return;
+            }
+            onClick?.();
+          }}
+        >
+          {content}
+        </Link>
+      );
+    }
     return (
       <Link
         href={href}
         className={`relative overflow-hidden ${classes}`}
-        onClick={handleLinkClick}
+        onPointerDown={animatedHandlers.onPointerDown}
+        onClick={animatedHandlers.onClick}
       >
         {content}
       </Link>
@@ -103,7 +100,8 @@ export function Button({
       type={type}
       className={`relative overflow-hidden ${classes}`}
       disabled={disabled}
-      onClick={handleButtonClick}
+      onPointerDown={animationActive ? animatedHandlers.onPointerDown : undefined}
+      onClick={animationActive ? animatedHandlers.onClick : () => onClick?.()}
     >
       {content}
     </button>
