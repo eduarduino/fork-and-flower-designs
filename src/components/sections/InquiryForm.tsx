@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useForm, type FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
+import { Turnstile } from "@marsidev/react-turnstile";
 import {
   inquirySchema,
   type InquiryFormData,
@@ -50,6 +51,14 @@ function getYearOptions(): number[] {
   const years: number[] = [];
   for (let y = current; y <= current + 3; y++) years.push(y);
   return years;
+}
+
+function RedAsterisk() {
+  return (
+    <span className="text-red-500" aria-hidden="true">
+      *
+    </span>
+  );
 }
 
 /* ── Signature Pad ── */
@@ -142,7 +151,7 @@ function SignaturePad({
     <div>
       <div className="flex items-center justify-between mb-2">
         <span className="font-sans text-[11px] tracking-[0.2em] uppercase text-charcoal">
-          Signature *
+          Signature <RedAsterisk />
         </span>
         {hasSignature && (
           <button
@@ -181,6 +190,11 @@ export function InquiryForm() {
   const [submitStatus, setSubmitStatus] = useState<
     "idle" | "loading" | "success" | "error"
   >("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // Bumping this remounts the SignaturePad, clearing the canvas on reset.
+  const [signatureKey, setSignatureKey] = useState(0);
+  // Bumping this remounts the Turnstile widget, forcing a fresh token on reset.
+  const [turnstileKey, setTurnstileKey] = useState(0);
 
   const {
     register,
@@ -198,12 +212,15 @@ export function InquiryForm() {
       services: [],
       phone: "",
       signature: "",
+      website: "",
+      turnstileToken: "",
     },
   });
 
   const phoneValue = watch("phone");
   const startTimeValue = watch("startTime");
   const eventTypeValue = watch("eventType");
+  const turnstileToken = watch("turnstileToken");
 
   // Date dropdowns state
   const [dateMonth, setDateMonth] = useState("");
@@ -223,6 +240,7 @@ export function InquiryForm() {
 
   const onSubmit = async (data: InquiryFormData) => {
     setSubmitStatus("loading");
+    setErrorMessage(null);
     try {
       const response = await fetch("/api/inquiry", {
         method: "POST",
@@ -230,14 +248,39 @@ export function InquiryForm() {
         body: JSON.stringify(data),
       });
 
-      if (!response.ok) throw new Error("Failed to submit");
+      if (!response.ok) {
+        if (response.status === 429) {
+          setErrorMessage(
+            "Too many submissions. Please wait a moment and try again."
+          );
+        } else if (response.status === 413) {
+          setErrorMessage(
+            "Your signature image is too large. Please clear and re-sign, then try again."
+          );
+        } else if (response.status === 400) {
+          setErrorMessage(
+            "Some fields look invalid. Please review the form and try again."
+          );
+        } else {
+          setErrorMessage(
+            "Something went wrong. Please try again or email us directly."
+          );
+        }
+        setSubmitStatus("error");
+        return;
+      }
 
       reset();
       setDateMonth("");
       setDateDay("");
       setDateYear("");
+      setSignatureKey((k) => k + 1);
+      setTurnstileKey((k) => k + 1);
       setSubmitStatus("success");
     } catch {
+      setErrorMessage(
+        "We couldn't reach the server. Please check your connection and try again."
+      );
       setSubmitStatus("error");
     }
   };
@@ -307,7 +350,9 @@ export function InquiryForm() {
         <div className="space-y-8">
           <div className="grid gap-8 md:grid-cols-2">
             <div id="field-firstName">
-              <label className={labelStyles}>First Name *</label>
+              <label className={labelStyles}>
+                First Name <RedAsterisk />
+              </label>
               <input
                 {...register("firstName")}
                 className={inputStyles}
@@ -320,7 +365,9 @@ export function InquiryForm() {
               )}
             </div>
             <div id="field-lastName">
-              <label className={labelStyles}>Last Name *</label>
+              <label className={labelStyles}>
+                Last Name <RedAsterisk />
+              </label>
               <input
                 {...register("lastName")}
                 className={inputStyles}
@@ -335,7 +382,9 @@ export function InquiryForm() {
           </div>
           <div className="grid gap-8 md:grid-cols-2">
             <div id="field-phone">
-              <label className={labelStyles}>Phone # *</label>
+              <label className={labelStyles}>
+                Phone # <RedAsterisk />
+              </label>
               <input
                 type="tel"
                 inputMode="numeric"
@@ -358,7 +407,9 @@ export function InquiryForm() {
               )}
             </div>
             <div id="field-email">
-              <label className={labelStyles}>Email *</label>
+              <label className={labelStyles}>
+                Email <RedAsterisk />
+              </label>
               <input
                 {...register("email")}
                 type="email"
@@ -381,7 +432,9 @@ export function InquiryForm() {
         <div className="space-y-8">
           <div className="grid gap-8 md:grid-cols-2">
             <div id="field-eventDate">
-              <label className={labelStyles}>Event Date *</label>
+              <label className={labelStyles}>
+                Event Date <RedAsterisk />
+              </label>
               <input type="hidden" {...register("eventDate")} />
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div className="relative">
@@ -452,7 +505,9 @@ export function InquiryForm() {
               )}
             </div>
             <div id="field-startTime">
-              <label className={labelStyles}>Start Time *</label>
+              <label className={labelStyles}>
+                Start Time <RedAsterisk />
+              </label>
               <div className="relative">
                 <select
                   {...register("startTime")}
@@ -483,7 +538,9 @@ export function InquiryForm() {
           </div>
           <div className="grid gap-8 md:grid-cols-2">
             <div id="field-eventType">
-              <label className={labelStyles}>Type of Event *</label>
+              <label className={labelStyles}>
+                Type of Event <RedAsterisk />
+              </label>
               <div className="relative">
                 <select
                   {...register("eventType")}
@@ -512,7 +569,9 @@ export function InquiryForm() {
               )}
             </div>
             <div id="field-guestCount">
-              <label className={labelStyles}># of Guests *</label>
+              <label className={labelStyles}>
+                # of Guests <RedAsterisk />
+              </label>
               <input
                 {...register("guestCount")}
                 type="number"
@@ -534,7 +593,7 @@ export function InquiryForm() {
       <fieldset id="field-services">
         <legend className={sectionTitleStyles}>What services are you interested in?</legend>
         <p className="font-sans text-xs tracking-wider text-charcoal-light -mt-4 mb-5">
-          Select all that apply.
+          Choose at least one. Select all that apply. <RedAsterisk />
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
           {serviceOptions.map((option) => (
@@ -578,7 +637,7 @@ export function InquiryForm() {
       <fieldset id="field-packages">
         <legend className={sectionTitleStyles}>What packages are you considering?</legend>
         <p className="font-sans text-xs tracking-wider text-charcoal-light -mt-4 mb-5">
-          Select all that apply.
+          Choose at least one. Select all that apply. <RedAsterisk />
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
           {packageOptions.map((option) => (
@@ -703,8 +762,8 @@ export function InquiryForm() {
           </div>
 
           <div id="field-foodOnIsland">
-            <label className="block mb-4 font-sans text-[11px] tracking-[0.14em] sm:tracking-[0.2em] uppercase leading-relaxed text-charcoal">
-              Will food be displayed on the island? *
+            <label className="mb-4 block font-sans text-[11px] tracking-[0.14em] sm:tracking-[0.2em] uppercase leading-relaxed text-charcoal">
+              Will food be displayed on the island? <RedAsterisk />
             </label>
             <div className="grid max-w-[220px] grid-cols-2 gap-4">
               {(["yes", "no"] as const).map((val) => (
@@ -762,7 +821,7 @@ export function InquiryForm() {
             </span>
             <span className="font-sans text-xs leading-relaxed tracking-wider text-charcoal-light group-hover:text-charcoal transition-colors">
               I understand a non-refundable booking fee is required to secure my
-              date.{"\u00A0*"}
+              date. <RedAsterisk />
             </span>
           </label>
           {errors.acknowledgeBookingFee && (
@@ -794,7 +853,8 @@ export function InquiryForm() {
               </svg>
             </span>
             <span className="font-sans text-xs leading-relaxed tracking-wider text-charcoal-light group-hover:text-charcoal transition-colors">
-              I understand this form does not guarantee availability.{"\u00A0*"}
+              I understand this form does not guarantee availability.{" "}
+              <RedAsterisk />
             </span>
           </label>
           {errors.acknowledgeAvailability && (
@@ -810,7 +870,9 @@ export function InquiryForm() {
         <legend className={sectionTitleStyles}>Signature</legend>
         <div className="space-y-8">
           <div id="field-printName">
-            <label className={labelStyles}>Print Name *</label>
+            <label className={labelStyles}>
+              Print Name <RedAsterisk />
+            </label>
             <input
               {...register("printName")}
               className={inputStyles}
@@ -824,6 +886,7 @@ export function InquiryForm() {
           </div>
           <div id="field-signature">
             <SignaturePad
+              key={signatureKey}
               onChange={(dataUrl) =>
                 setValue("signature", dataUrl, { shouldValidate: true })
               }
@@ -833,12 +896,59 @@ export function InquiryForm() {
         </div>
       </fieldset>
 
+      {/* Honeypot — must stay empty. Hidden from sighted and AT users. */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          left: "-10000px",
+          top: "auto",
+          width: "1px",
+          height: "1px",
+          overflow: "hidden",
+        }}
+      >
+        <label>
+          Website
+          <input
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            {...register("website")}
+          />
+        </label>
+      </div>
+
       {/* Error Message */}
       {submitStatus === "error" && (
-        <p className="text-center text-sm text-red-500">
-          Something went wrong. Please try again or email us directly.
+        <p className="text-center text-sm text-red-500" role="alert">
+          {errorMessage ??
+            "Something went wrong. Please try again or email us directly."}
         </p>
       )}
+
+      {/* Cloudflare Turnstile — bot verification. */}
+      <div className="flex flex-col items-center" id="field-turnstileToken">
+        <Turnstile
+          key={turnstileKey}
+          siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ""}
+          options={{ theme: "light" }}
+          onSuccess={(token) =>
+            setValue("turnstileToken", token, { shouldValidate: true })
+          }
+          onExpire={() =>
+            setValue("turnstileToken", "", { shouldValidate: true })
+          }
+          onError={() =>
+            setValue("turnstileToken", "", { shouldValidate: true })
+          }
+        />
+        {errors.turnstileToken && (
+          <p className="mt-2 text-sm text-red-500" role="alert">
+            {errors.turnstileToken.message}
+          </p>
+        )}
+      </div>
 
       {/* Submit */}
       <div className="pt-4">
@@ -847,7 +957,7 @@ export function InquiryForm() {
           variant="primary"
           size="lg"
           className="w-full transition-opacity duration-300"
-          disabled={submitStatus === "loading"}
+          disabled={submitStatus === "loading" || !turnstileToken}
         >
           {submitStatus === "loading" ? (
             <span className="flex items-center gap-2">
