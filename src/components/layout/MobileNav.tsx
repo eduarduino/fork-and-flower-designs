@@ -4,16 +4,40 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { navLinks, socialLinks } from "@/data/navigation";
 import { BrandLogo } from "@/components/brand/BrandLogo";
-import { useForkStab } from "@/hooks/useForkStab";
+import { useForkAnimatedAction } from "@/hooks/useForkAnimatedAction";
 
 interface MobileNavProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function MobileNav({ isOpen, onClose }: MobileNavProps) {
-  const { onPointerDown, onClick: onStabClick } = useForkStab();
+function NavItem({
+  href,
+  label,
+  onClose,
+}: {
+  href: string;
+  label: string;
+  onClose: () => void;
+}) {
+  const handlers = useForkAnimatedAction({
+    mode: "link",
+    href,
+    onBeforeNavigate: onClose,
+  });
+  return (
+    <Link
+      href={href}
+      onPointerDown={handlers.onPointerDown}
+      onClick={handlers.onClick}
+      className="font-sans text-sm tracking-[0.25em] uppercase text-charcoal hover:text-gold transition-colors duration-300"
+    >
+      {label}
+    </Link>
+  );
+}
 
+export function MobileNav({ isOpen, onClose }: MobileNavProps) {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -62,14 +86,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.25 + i * 0.08 }}
               >
-                <Link
-                  href={link.href}
-                  onClick={(e) => { onStabClick(e); onClose(); }}
-                  onPointerDown={onPointerDown}
-                  className="font-sans text-sm tracking-[0.25em] uppercase text-charcoal hover:text-gold transition-colors duration-300"
-                >
-                  {link.label}
-                </Link>
+                <NavItem href={link.href} label={link.label} onClose={onClose} />
               </motion.div>
             ))}
 

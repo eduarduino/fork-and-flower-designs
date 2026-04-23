@@ -12,7 +12,7 @@ import {
   premiumAddOns,
   type Package,
 } from "@/data/packages";
-import { useForkStab } from "@/hooks/useForkStab";
+import { useForkAnimatedAction } from "@/hooks/useForkAnimatedAction";
 
 /* ───────────────────── Detail Modal ───────────────────── */
 
@@ -140,7 +140,10 @@ function PackageCard({
   pkg: Package;
   onViewDetails?: (pkg: Package) => void;
 }) {
-  const { onPointerDown, onClick: onStabClick } = useForkStab();
+  const detailsHandlers = useForkAnimatedAction({
+    mode: "action",
+    action: () => onViewDetails?.(pkg),
+  });
   const isSignature = pkg.name.toLowerCase().includes("signature");
   const isFullHome = pkg.name.toLowerCase().includes("full home");
 
@@ -189,8 +192,8 @@ function PackageCard({
 
         {pkg.detailedDescription && onViewDetails && (
           <button
-            onClick={(e) => { onStabClick(e); onViewDetails(pkg); }}
-            onPointerDown={onPointerDown}
+            onPointerDown={detailsHandlers.onPointerDown}
+            onClick={detailsHandlers.onClick}
             className="mt-6 self-start inline-flex items-center gap-2 font-serif text-base font-medium italic text-gold-dark hover:text-charcoal transition-colors"
           >
             <span>View full details</span>
