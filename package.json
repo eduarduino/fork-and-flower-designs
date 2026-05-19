@@ -37,8 +37,8 @@
     "eslint": "^8",
     "eslint-config-next": "^15.5.14",
     "react-email": "^6.1.5",
+    "sharp": "^0.34.5",
     "tailwindcss": "^3.4.19",
-    "to-ico": "^1.1.5",
     "typescript": "^5"
   }
 }

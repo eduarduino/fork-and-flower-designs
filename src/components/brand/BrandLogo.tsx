@@ -3,7 +3,6 @@ import Link from "next/link";
 import {
   BRAND_LOGO_ALT,
   getLogoForPreset,
-  type BrandLogoContext,
   type BrandLogoPreset,
 } from "@/lib/brand";
 
@@ -17,7 +16,6 @@ const presetClasses: Record<BrandLogoPreset, string> = {
   footer: "h-20 w-auto sm:h-24 md:h-28",
   hero: "h-32 w-auto sm:h-40 md:h-48 lg:h-56",
   mobileNav: "h-[4.5rem] w-auto sm:h-20",
-  cta: "h-12 w-auto sm:h-14 md:h-16",
 };
 
 const presetSizes: Record<BrandLogoPreset, string> = {
@@ -26,7 +24,6 @@ const presetSizes: Record<BrandLogoPreset, string> = {
   footer: "(max-width: 640px) 80px, (max-width: 768px) 96px, 112px",
   hero: "(max-width: 640px) 128px, (max-width: 768px) 160px, (max-width: 1024px) 192px, 224px",
   mobileNav: "(max-width: 640px) 72px, 80px",
-  cta: "(max-width: 640px) 48px, (max-width: 768px) 56px, 64px",
 };
 
 const presetLinkClasses: Record<BrandLogoPreset, string> = {
@@ -34,12 +31,10 @@ const presetLinkClasses: Record<BrandLogoPreset, string> = {
   footer: "",
   hero: "",
   mobileNav: "",
-  cta: "",
 };
 
 export interface BrandLogoProps {
   preset: BrandLogoPreset;
-  context?: BrandLogoContext;
   /** Use for above-the-fold marks (header, hero) to improve LCP */
   priority?: boolean;
   className?: string;
@@ -47,12 +42,10 @@ export interface BrandLogoProps {
 
 export function BrandLogo({
   preset,
-  context = "onLight",
   priority = false,
   className,
 }: BrandLogoProps) {
-  const src = getLogoForPreset(preset, context);
-  const onDark = context === "onDark";
+  const src = getLogoForPreset(preset);
 
   return (
     <Link

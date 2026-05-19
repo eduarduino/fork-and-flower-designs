@@ -58,7 +58,7 @@ export function Header() {
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
           {/* Logo */}
-          <BrandLogo preset="header" context="onLight" priority />
+          <BrandLogo preset="header" priority />
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-8">

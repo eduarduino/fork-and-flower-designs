@@ -26,7 +26,7 @@ export function HeroSection() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <BrandLogo preset="hero" context="onLight" priority />
+          <BrandLogo preset="hero" priority />
         </motion.div>
 
         <motion.h1

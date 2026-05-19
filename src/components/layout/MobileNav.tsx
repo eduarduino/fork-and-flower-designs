@@ -76,7 +76,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <BrandLogo preset="mobileNav" context="onLight" />
+              <BrandLogo preset="mobileNav" />
             </motion.div>
 
             {navLinks.map((link, i) => (
