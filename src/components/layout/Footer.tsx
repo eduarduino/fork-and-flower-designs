@@ -27,7 +27,7 @@ export function Footer() {
         <div className="flex flex-col items-center gap-10 md:flex-row md:justify-between md:items-start">
           {/* Brand */}
           <div className="text-center md:text-left">
-            <BrandLogo preset="footer" context="onDark" />
+            <BrandLogo preset="footer" />
             <p className="mt-4 font-sans text-xs tracking-wider text-cream/60 max-w-xs">
               Floral-forward event styling for intimate at-home gatherings.
               A traveling service — no storefront.
