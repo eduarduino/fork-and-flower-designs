@@ -1,19 +1,10 @@
 import type { InquiryFormData } from "@/lib/schemas/inquiry";
 import {
-  serviceOptions,
-  packageOptions,
-  addOnOptions,
-} from "@/lib/schemas/inquiry";
-
-const SERVICE_LABELS: Record<string, string> = Object.fromEntries(
-  serviceOptions.map((s) => [s.value, s.label])
-);
-const PACKAGE_LABELS: Record<string, string> = Object.fromEntries(
-  packageOptions.map((p) => [p.value, p.label])
-);
-const ADDON_LABELS: Record<string, string> = Object.fromEntries(
-  addOnOptions.map((a) => [a.value, a.label])
-);
+  ADDON_LABELS,
+  PACKAGE_LABELS,
+  SERVICE_LABELS,
+  labelList,
+} from "@/lib/inquiry-labels";
 
 export type SlackNotificationKind = "new_inquiry" | "owner_email_failed";
 
@@ -31,15 +22,6 @@ function escapeSlack(value: string): string {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
-}
-
-function labelList(
-  values: readonly string[] | undefined,
-  map: Record<string, string>,
-  fallback: string
-): string {
-  if (!values || values.length === 0) return fallback;
-  return values.map((v) => map[v] ?? v).join(", ");
 }
 
 type SlackBlock =

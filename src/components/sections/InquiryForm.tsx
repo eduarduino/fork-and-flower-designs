@@ -127,15 +127,30 @@ function SignaturePad({
     onChange(canvas.toDataURL("image/png"));
   };
 
-  const clearCanvas = useCallback(() => {
+  // Paint the canvas with an opaque white background. The PNG exported
+  // by `canvas.toDataURL` is otherwise transparent (the form's white
+  // appearance comes from a CSS background that is *not* baked into the
+  // pixel data). Without this, Gmail's dark-mode inversion would render
+  // the dark signature strokes against a dark background, making the
+  // signature invisible in the owner's inbox.
+  const paintBackground = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }, []);
+
+  const clearCanvas = useCallback(() => {
+    paintBackground();
     setHasSignature(false);
     onChange("");
-  }, [onChange]);
+  }, [onChange, paintBackground]);
+
+  useEffect(() => {
+    paintBackground();
+  }, [paintBackground]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
