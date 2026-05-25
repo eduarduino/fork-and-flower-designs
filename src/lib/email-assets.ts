@@ -17,10 +17,22 @@
  *      Standard marketing-site URL. Used as the fallback so a single
  *      env var configures both the site and the emails.
  *
- *   3. https://${VERCEL_URL}
- *      Set automatically on every Vercel deploy / preview.
+ *   3. https://${VERCEL_PROJECT_PRODUCTION_URL}
+ *      Vercel's stable production-alias / custom-domain host
+ *      (e.g. `fork-and-flower-designs.vercel.app`, or
+ *      `forkandflowerdesigns.com` once a custom production domain is
+ *      attached). Set on production *and* preview deploys, so a
+ *      customer email accidentally sent from a preview still links to
+ *      production — which is what we want for customer-facing CTAs.
  *
- *   4. http://localhost:3000
+ *   4. https://${VERCEL_URL}
+ *      Per-deployment URL Vercel auto-injects (e.g.
+ *      `fork-and-flower-designs-l9l3tavcq-….vercel.app`). Rotates on
+ *      every deploy and eventually becomes unreachable, so it is a
+ *      last-ditch fallback — never the desired source for an email
+ *      link or image src.
+ *
+ *   5. http://localhost:3000
  *      Last-resort dev fallback. Will *not* render in real email
  *      clients — a warning is logged on first resolution in production.
  *
@@ -59,6 +71,7 @@ export function getEmailBaseUrl(): string {
   const explicit =
     normalize(process.env.NEXT_PUBLIC_EMAIL_ASSET_BASE_URL) ??
     normalize(process.env.NEXT_PUBLIC_SITE_URL) ??
+    normalize(process.env.VERCEL_PROJECT_PRODUCTION_URL) ??
     normalize(process.env.VERCEL_URL);
 
   if (explicit) return explicit;
@@ -67,9 +80,10 @@ export function getEmailBaseUrl(): string {
     warnedAboutLocalFallback = true;
     console.warn(
       "[email-assets] No NEXT_PUBLIC_EMAIL_ASSET_BASE_URL, " +
-        "NEXT_PUBLIC_SITE_URL, or VERCEL_URL set in production. " +
-        "Email images will fall back to localhost and will not render " +
-        "in Gmail, Apple Mail, or Outlook.",
+        "NEXT_PUBLIC_SITE_URL, VERCEL_PROJECT_PRODUCTION_URL, or " +
+        "VERCEL_URL set in production. Email links and images will " +
+        "fall back to localhost and will not render in Gmail, Apple " +
+        "Mail, or Outlook.",
     );
   }
   return LOCAL_FALLBACK;
