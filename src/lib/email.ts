@@ -103,11 +103,19 @@ export async function sendClientConfirmation(data: InquiryFormData) {
   const resend = getResendClient();
 
   const from = process.env.FROM_EMAIL;
+  const businessEmail = process.env.BUSINESS_EMAIL;
   if (!from) throw new Error("FROM_EMAIL is not configured");
+
+  // Resend's bounce-handling MX must live on the same subdomain you send
+  // from, which forces FROM_EMAIL onto a `send.` subdomain whose mailbox
+  // doesn't exist on Google Workspace. Route replies to BUSINESS_EMAIL
+  // (the real inbox at the apex) so customer replies actually reach her.
+  const replyTo = businessEmail ?? from;
 
   const clientResult = await resend.emails.send({
     from: sanitizeHeaderValue(from),
     to: sanitizeHeaderValue(data.email),
+    replyTo: sanitizeHeaderValue(replyTo),
     subject: "Thank you for your inquiry — Fork & Flower Designs",
     react: InquiryConfirmationEmail({
       data,
