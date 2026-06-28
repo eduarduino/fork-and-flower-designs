@@ -9,6 +9,8 @@ import {
   type GalleryCategory,
 } from "@/data/gallery";
 import { useForkAnimatedAction } from "@/hooks/useForkAnimatedAction";
+import { usePhotoTap } from "@/hooks/usePhotoTap";
+import { PhotoLightbox } from "@/components/ui/PhotoLightbox";
 
 type FilterCategory = (typeof galleryCategories)[number];
 type GalleryImageEntry = (typeof galleryImages)[number];
@@ -46,12 +48,9 @@ function GalleryTile({
   onOpen,
 }: {
   image: GalleryImageEntry;
-  onOpen: (id: string) => void;
+  onOpen: () => void;
 }) {
-  const handlers = useForkAnimatedAction({
-    mode: "action",
-    action: () => onOpen(image.id),
-  });
+  const handlers = usePhotoTap(onOpen);
   return (
     <motion.div
       layout
@@ -61,6 +60,7 @@ function GalleryTile({
       transition={{ duration: 0.35, ease: "easeOut" }}
       className="group cursor-pointer"
       onPointerDown={handlers.onPointerDown}
+      onPointerMove={handlers.onPointerMove}
       onClick={handlers.onClick}
     >
       <div className="relative overflow-hidden bg-cream-dark aspect-[4/5]">
@@ -79,16 +79,17 @@ function GalleryTile({
 
 export function GalleryGrid() {
   const [activeCategory, setActiveCategory] = useState<GalleryCategory>("all");
-  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const filteredImages =
     activeCategory === "all"
       ? galleryImages
       : galleryImages.filter((img) => img.category === activeCategory);
 
-  const lightboxEntry = lightboxImage
-    ? galleryImages.find((img) => img.id === lightboxImage)
-    : null;
+  const handleSelectCategory = (value: GalleryCategory) => {
+    setLightboxIndex(null);
+    setActiveCategory(value);
+  };
 
   return (
     <>
@@ -99,7 +100,7 @@ export function GalleryGrid() {
             key={cat.value}
             cat={cat}
             isActive={activeCategory === cat.value}
-            onSelect={setActiveCategory}
+            onSelect={handleSelectCategory}
           />
         ))}
       </div>
@@ -110,65 +111,23 @@ export function GalleryGrid() {
         layout
       >
         <AnimatePresence mode="popLayout">
-          {filteredImages.map((image) => (
+          {filteredImages.map((image, i) => (
             <GalleryTile
               key={image.id}
               image={image}
-              onOpen={setLightboxImage}
+              onOpen={() => setLightboxIndex(i)}
             />
           ))}
         </AnimatePresence>
       </motion.div>
 
       {/* Lightbox */}
-      <AnimatePresence>
-        {lightboxEntry && (
-          <motion.div
-            className="fixed inset-0 z-[200] flex items-center justify-center bg-charcoal/80 backdrop-blur-sm p-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setLightboxImage(null)}
-          >
-            <motion.div
-              className="relative max-w-4xl w-full max-h-[85vh]"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Image
-                src={lightboxEntry.src}
-                alt={lightboxEntry.alt}
-                width={lightboxEntry.src.width}
-                height={lightboxEntry.src.height}
-                sizes="(max-width: 1024px) 90vw, 896px"
-                className="h-auto max-h-[85vh] w-auto mx-auto object-contain"
-              />
-
-              {/* Close */}
-              <button
-                onClick={() => setLightboxImage(null)}
-                className="absolute -top-2 -right-2 md:top-2 md:right-2 bg-charcoal/60 hover:bg-charcoal/80 text-cream rounded-full p-2 transition-colors"
-                aria-label="Close lightbox"
-              >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                >
-                  <line x1="4" y1="4" x2="20" y2="20" />
-                  <line x1="20" y1="4" x2="4" y2="20" />
-                </svg>
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <PhotoLightbox
+        photos={filteredImages.map((img) => ({ src: img.src, alt: img.alt }))}
+        index={lightboxIndex}
+        onIndexChange={setLightboxIndex}
+        onClose={() => setLightboxIndex(null)}
+      />
     </>
   );
 }

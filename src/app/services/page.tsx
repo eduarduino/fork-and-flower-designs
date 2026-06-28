@@ -3,7 +3,7 @@ import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
 import { services } from "@/data/services";
-import { ServiceDetailCard } from "@/components/sections/ServiceCard";
+import { ServicesDetailSection } from "@/components/sections/ServiceCard";
 
 export const metadata: Metadata = {
   title: "Services",
@@ -26,16 +26,7 @@ export default function ServicesPage() {
 
       {/* Service Sections */}
       <Section background="white" contentAfterPageHeader>
-        <div className="space-y-20 md:space-y-28">
-          {services.map((service, i) => (
-            <ServiceDetailCard
-              key={service.id}
-              service={service}
-              index={i}
-              reversed={i % 2 !== 0}
-            />
-          ))}
-        </div>
+        <ServicesDetailSection services={services} />
       </Section>
 
       {/* CTA */}

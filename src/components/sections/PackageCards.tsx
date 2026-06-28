@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   StaggerChildren,
@@ -40,9 +40,29 @@ function PackageDetailModal({
     };
   }, [handleKey]);
 
+  // Scroll cue: show a soft bottom fade only while more content remains below.
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showScrollCue, setShowScrollCue] = useState(false);
+
+  const updateScrollCue = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const remaining = el.scrollHeight - el.clientHeight - el.scrollTop;
+    setShowScrollCue(remaining > 8);
+  }, []);
+
+  useEffect(() => {
+    updateScrollCue();
+    const el = scrollRef.current;
+    if (!el) return;
+    const onResize = () => updateScrollCue();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [updateScrollCue]);
+
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[200] flex items-center justify-center px-4 pt-[calc(env(safe-area-inset-top)+6.5rem)] pb-[calc(env(safe-area-inset-bottom)+1.5rem)] sm:px-6 sm:pt-[8.5rem] sm:pb-12"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -59,16 +79,16 @@ function PackageDetailModal({
 
       {/* Modal Card */}
       <motion.div
-        className="relative w-full max-w-lg max-h-[85vh] overflow-y-auto bg-white border border-cream-dark p-8 md:p-10 shadow-2xl"
+        className="relative flex flex-col w-full max-w-lg max-h-[calc(100dvh-9.5rem)] sm:max-h-[calc(100dvh-11.5rem)] overflow-hidden bg-white border border-cream-dark shadow-2xl"
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
       >
-        {/* Close Button */}
+        {/* Close Button — stays pinned to the card while content scrolls */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-charcoal-light hover:text-charcoal transition-colors"
+          className="absolute top-4 right-4 z-10 text-charcoal-light hover:text-charcoal transition-colors"
           aria-label="Close details"
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -77,43 +97,71 @@ function PackageDetailModal({
           </svg>
         </button>
 
-        <h3 className="font-serif text-2xl md:text-3xl tracking-wide text-charcoal">
-          {pkg.name}
-        </h3>
-        <p className="mt-2 font-sans text-xs tracking-wider text-gold uppercase">
-          {pkg.description}
-        </p>
-
-        <div className="h-px bg-cream-dark my-6" />
-
-        {pkg.detailedDescription && (
-          <p className="font-sans text-sm leading-relaxed text-charcoal-light tracking-wider">
-            {pkg.detailedDescription}
+        <div
+          ref={scrollRef}
+          onScroll={updateScrollCue}
+          className="min-h-0 overflow-y-auto p-8 md:p-10"
+        >
+          <h3 className="font-serif text-2xl md:text-3xl tracking-wide text-charcoal pr-8">
+            {pkg.name}
+          </h3>
+          <p className="mt-2 font-sans text-xs tracking-wider text-gold uppercase">
+            {pkg.description}
           </p>
-        )}
 
-        <div className="h-px bg-cream-dark my-6" />
+          <div className="h-px bg-cream-dark my-6" />
 
-        <p className="font-sans text-[10px] tracking-[0.15em] uppercase text-charcoal mb-4">
-          What&apos;s Included
-        </p>
-        <ul className="space-y-3">
-          {pkg.includes.map((item) => (
-            <li
-              key={item}
-              className="flex items-start gap-3 font-sans text-xs tracking-wider text-charcoal-light"
-            >
-              <span className="mt-0.5 text-gold text-sm">✦</span>
-              {item}
-            </li>
-          ))}
-        </ul>
+          {pkg.detailedDescription && (
+            <p className="font-sans text-sm leading-relaxed text-charcoal-light tracking-wider">
+              {pkg.detailedDescription}
+            </p>
+          )}
 
-        {pkg.perfectFor && (
-          <p className="mt-6 font-serif text-sm italic text-charcoal-light/80">
-            {pkg.perfectFor}
+          <div className="h-px bg-cream-dark my-6" />
+
+          <p className="font-sans text-[10px] tracking-[0.15em] uppercase text-charcoal mb-4">
+            What&apos;s Included
           </p>
-        )}
+          <ul className="space-y-3">
+            {pkg.includes.map((item) => (
+              <li
+                key={item}
+                className="flex items-start gap-3 font-sans text-xs tracking-wider text-charcoal-light"
+              >
+                <span className="mt-0.5 text-gold text-sm">✦</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+
+          {pkg.perfectFor && (
+            <p className="mt-6 font-serif text-sm italic text-charcoal-light/80">
+              {pkg.perfectFor}
+            </p>
+          )}
+        </div>
+
+        {/* Scroll cue — subtle bottom fade + chevron, only when more remains */}
+        <div
+          className={`pointer-events-none absolute inset-x-0 bottom-0 flex justify-center pb-2 pt-10 bg-gradient-to-t from-white via-white/85 to-transparent transition-opacity duration-300 ${
+            showScrollCue ? "opacity-100" : "opacity-0"
+          }`}
+          aria-hidden
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-gold-dark/80"
+          >
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </div>
       </motion.div>
     </motion.div>
   );
