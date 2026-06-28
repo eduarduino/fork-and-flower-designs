@@ -3,7 +3,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
 import { services } from "@/data/services";
 import { HeroSection } from "@/components/sections/Hero";
-import { ServicePreviewCard } from "@/components/sections/ServiceCard";
+import { HomeServicesPreview } from "@/components/sections/ServiceCard";
 
 export default function Home() {
   return (
@@ -16,11 +16,7 @@ export default function Home() {
           title="Our Services"
           subtitle="Elevating every detail of your gathering"
         />
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {services.slice(0, 3).map((service, i) => (
-            <ServicePreviewCard key={service.id} service={service} index={i} />
-          ))}
-        </div>
+        <HomeServicesPreview services={services.slice(0, 3)} />
         <div className="mt-14 text-center">
           <Button href="/services" variant="outline">
             Explore All Services
