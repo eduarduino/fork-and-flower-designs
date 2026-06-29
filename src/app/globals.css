@@ -5,6 +5,15 @@
 :root {
   --background: #FFFFFF;
   --foreground: #3A320C;
+  /* Fixed-header clearance. Covers the tallest header state (logo + vertical
+     padding) so viewport-fixed overlays can stay below the navbar. */
+  --header-height: 7rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-height: 8rem;
+  }
 }
 
 body {

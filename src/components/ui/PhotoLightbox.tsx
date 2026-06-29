@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import type { StaticImageData } from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,6 +25,13 @@ export function PhotoLightbox({
   onIndexChange,
   onClose,
 }: PhotoLightboxProps) {
+  // Portal to <body> so the overlay escapes any ancestor stacking context
+  // (e.g. Section's `relative z-10` wrapper). Without this, the modal's
+  // `z-[200]` is trapped below the fixed header's root-level `z-50`, which is
+  // what pushed the close button behind the navbar.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const isOpen = index !== null && index >= 0 && index < photos.length;
   const hasMultiple = photos.length > 1;
   const isFirst = index === 0;
@@ -58,7 +66,9 @@ export function PhotoLightbox({
 
   const photo = isOpen ? photos[index] : null;
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       {photo && (
         <motion.div
@@ -68,6 +78,28 @@ export function PhotoLightbox({
           exit={{ opacity: 0 }}
           onClick={onClose}
         >
+          {/* Close (desktop) — fixed to the viewport (not the card) so it can
+              never be pushed off-screen or behind the fixed header by a tall
+              image. Cleared below the navbar via --header-height and layered
+              above the overlay content with z-[210]. */}
+          <button
+            onClick={onClose}
+            className="fixed right-6 top-[calc(var(--header-height,8rem)+1rem)] z-[210] hidden rounded-full bg-charcoal/60 p-2 text-cream transition-colors hover:bg-charcoal/80 md:block"
+            aria-label="Close lightbox"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <line x1="4" y1="4" x2="20" y2="20" />
+              <line x1="20" y1="4" x2="4" y2="20" />
+            </svg>
+          </button>
+
           <motion.div
             key={index}
             className="relative max-w-4xl w-full max-h-[85vh]"
@@ -86,10 +118,12 @@ export function PhotoLightbox({
               className="h-auto max-h-[85vh] w-auto mx-auto object-contain"
             />
 
-            {/* Close */}
+            {/* Close (mobile) — anchored to the image card, unchanged from the
+                original mobile experience. Hidden on desktop, where the
+                viewport-fixed button above takes over. */}
             <button
               onClick={onClose}
-              className="absolute -top-2 -right-2 md:top-2 md:right-2 bg-charcoal/60 hover:bg-charcoal/80 text-cream rounded-full p-2 transition-colors"
+              className="absolute -top-2 -right-2 z-10 rounded-full bg-charcoal/60 p-2 text-cream transition-colors hover:bg-charcoal/80 md:hidden"
               aria-label="Close lightbox"
             >
               <svg
@@ -158,6 +192,7 @@ export function PhotoLightbox({
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }
