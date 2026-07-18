@@ -26,6 +26,9 @@ package-lock.json
 *.pem
 /references
 
+# generated-asset font cache (fetched by scripts/generate-og-and-favicons.mjs)
+/.cache
+
 # debug
 npm-debug.log*
 yarn-debug.log*

@@ -8,7 +8,10 @@
  * Outputs:
  *   assets/logos/generated/mainLogo-{width}w.png
  *   assets/logos/generated/forkFromLogo-{width}w.png  (trimmed first)
- *   src/app/icon.png, src/app/apple-icon.png, public/favicon.ico
+ *
+ * NOTE: Favicons/app icons are NOT emitted here. They are owned solely by
+ * scripts/generate-og-and-favicons.mjs (sourced from the blush wordmark tile)
+ * so re-running this script never overwrites them.
  *
  * Run: node scripts/generate-logo-assets.mjs
  */
@@ -133,31 +136,7 @@ for (const w of horizontalForkWidths) {
   console.log(`  forkFromLogo-horizontal-${w}w.png (${w}×${h})`);
 }
 
-// ---------------------------------------------------------------------------
-// 4. Favicons from forkFromLogo (original colors, padded into square)
-// ---------------------------------------------------------------------------
-const forkSquareSize = Math.max(forkMeta.width, forkMeta.height);
-const forkSquare = await sharp(trimmedFork)
-  .resize(forkSquareSize, forkSquareSize, {
-    fit: "contain",
-    background: { r: 0, g: 0, b: 0, alpha: 0 },
-  })
-  .ensureAlpha()
-  .png()
-  .toBuffer();
-
-await sharp(forkSquare)
-  .resize(96, 96, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 }, kernel: sharp.kernel.lanczos3 })
-  .ensureAlpha()
-  .png()
-  .toFile(join(appDir, "icon.png"));
-console.log("  src/app/icon.png (96×96)");
-
-await sharp(forkSquare)
-  .resize(180, 180, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 }, kernel: sharp.kernel.lanczos3 })
-  .ensureAlpha()
-  .png()
-  .toFile(join(appDir, "apple-icon.png"));
-console.log("  src/app/apple-icon.png (180×180)");
+// Favicons/app icons are intentionally generated elsewhere — see the header
+// note and scripts/generate-og-and-favicons.mjs.
 
 console.log("\nDone. All assets generated.");
